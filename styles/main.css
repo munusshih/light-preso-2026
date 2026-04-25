@@ -1,0 +1,260 @@
+/* Critical AI Potluck — customize here */
+
+:root {
+    --bg: rgb(255, 255, 241);
+    --fg: #111;
+    --border: #111;
+    --bg-subtle: #f6f6f6;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    margin: 0;
+    font-family: serif;
+    line-height: 1.4;
+    font-size: 20px;
+    background: var(--bg);
+    color: var(--fg);
+    overflow-x: hidden;
+}
+
+nav {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    overflow-y: auto;
+    width: 250px;
+    flex-shrink: 0;
+    padding: 2em 1em;
+    border-right: 1px solid var(--border);
+    font-family: monospace;
+    font-size: 0.85em;
+    line-height: 1.6;
+    background-image:
+        repeating-linear-gradient(45deg, rgba(17, 17, 17, 0.08) 0, rgba(17, 17, 17, 0.08) 1px, transparent 0, transparent 50%),
+        repeating-linear-gradient(-45deg, rgba(17, 17, 17, 0.08) 0, rgba(17, 17, 17, 0.08) 1px, transparent 0, transparent 50%);
+    background-size: 12px 12px;
+    background-color: var(--bg);
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav li {
+    position: relative;
+    padding-left: 1.6em;
+}
+
+nav li::before {
+    content: '\251C\2500\2500\00A0';
+    position: absolute;
+    left: 0;
+    opacity: 0.4;
+}
+
+nav li:last-child::before {
+    content: '\2514\2500\2500\00A0';
+}
+
+/* nested folder indentation */
+nav ul ul {
+    margin-top: 0;
+}
+
+nav a {
+    color: var(--fg);
+    text-decoration: none;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+nav a[aria-current] {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+main {
+    padding: 2em 2em;
+    max-width: 900px;
+}
+
+main.pdf-mode {
+    max-width: none;
+    width: calc(100vw - 250px);
+    padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    line-height: 1.2;
+    text-wrap: balance;
+    font-weight: normal;
+}
+
+p {
+    text-wrap: pretty;
+}
+
+main li:has(> input[type="checkbox"]) {
+    list-style: none;
+}
+
+main ul:has(> li > input[type="checkbox"]) {
+    padding-left: 0;
+    margin-left: 0;
+}
+
+main li>input[type="checkbox"] {
+    margin-right: 0.45em;
+    transform: translateY(0.03em);
+}
+
+img,
+.p5-sketch canvas {
+    max-width: 100%;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td,
+th {
+    border: 1px solid var(--border);
+    padding: 0.3em 0.6em;
+}
+
+pre {
+    position: relative;
+    border: 1px solid var(--border);
+    padding: 1.9em 1em 1em;
+    overflow-x: auto;
+}
+
+.code-lang {
+    position: absolute;
+    top: 0.45em;
+    left: 0.8em;
+    font-size: 0.65em;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    opacity: 0.65;
+}
+
+:not(pre)>code {
+    display: inline-block;
+    font-size: 0.8em;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 0.4em;
+    right: 0.5em;
+    font-size: 0.75em;
+    cursor: pointer;
+}
+
+pre:hover .copy-btn {
+    opacity: 1;
+}
+
+.page-meta {
+    margin-top: 3em;
+    padding-top: 0.75em;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1em;
+    font-size: 0.8em;
+}
+
+.edit-link,
+.page-size {
+    margin: 0;
+}
+
+.page-size {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.pdf-viewer {
+    width: 100%;
+    height: 100vh;
+    border: 1px solid var(--border);
+    background: #fff;
+}
+
+@media (max-width: 900px) {
+    body {
+        flex-direction: column;
+        font-size: 18px;
+    }
+
+    nav {
+        position: static;
+        height: auto;
+        overflow-y: visible;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 1em;
+    }
+
+    main {
+        padding: 1.25em;
+    }
+
+    main.pdf-mode {
+        width: 100%;
+    }
+
+    .page-size {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .pdf-viewer {
+        height: 70vh;
+    }
+}
+
+@media (max-width: 600px) {
+    main {
+        padding: 1em;
+    }
+
+    .page-meta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .page-size {
+        text-align: left;
+    }
+
+    .pdf-viewer {
+        height: 62vh;
+    }
+}

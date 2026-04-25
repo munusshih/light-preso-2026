@@ -1,0 +1,17 @@
+/* dot-grid paper background */
+body {
+    background-image: repeating-linear-gradient(180deg,
+            transparent 0px,
+            transparent 19px,
+            skyblue 20px);
+}
+
+/* lined dark sidebar */
+nav {
+    border-right: red 1px solid;
+    background-image: radial-gradient(circle, #b0a090 1px, transparent 1px);
+}
+
+table {
+    background: white;
+}
