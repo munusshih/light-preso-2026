@@ -166,6 +166,7 @@ const main = document.querySelector("main");
 async function loadPage(slug) {
   p5Queue = [];
   main.classList.remove("pdf-mode");
+  applyPageJS(null);
   const res = await fetch(`content/${slug}.md`);
   if (!res.ok) {
     main.innerHTML = "<p>Page not found...or yet to be found.</p>";
@@ -189,7 +190,6 @@ async function loadPage(slug) {
   }
 
   applyPageCSS(data.css || null);
-  applyPageJS(data.js || null);
   document.title = data.title ? `${data.title} — ${SITE_NAME}` : SITE_NAME;
   setNavActive(slug);
 
@@ -224,6 +224,13 @@ async function loadPage(slug) {
   }
 
   main.appendChild(footerMeta);
+
+  applyPageJS(data.js || null);
+  window.dispatchEvent(
+    new CustomEvent("preso:page-loaded", {
+      detail: { slug, frontMatter: data },
+    }),
+  );
 
   window.scrollTo(0, 0);
 }

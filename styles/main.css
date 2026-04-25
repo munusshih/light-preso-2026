@@ -1,10 +1,10 @@
 /* Preso — customize here */
 
 :root {
-    --bg: rgb(255, 255, 241);
+    --bg: #f7f5ee;
     --fg: #111;
     --border: #111;
-    --bg-subtle: #f6f6f6;
+    --bg-subtle: #efede6;
 }
 
 * {
@@ -14,18 +14,18 @@
 body {
     min-height: 100vh;
     margin: 0;
-    font-family: serif;
+    font-family: "Times New Roman", Times, serif;
     line-height: 1.4;
-    font-size: 20px;
+    font-size: 18px;
     background: var(--bg);
     color: var(--fg);
     overflow-x: hidden;
 }
 
 main {
-    padding: 2em;
-    margin: 0 auto;
-    max-width: 900px;
+    padding: 1.25rem;
+    margin: 0;
+    max-width: none;
 }
 
 main.pdf-mode {
@@ -39,12 +39,7 @@ h2,
 h3,
 h4 {
     line-height: 1.2;
-    text-wrap: balance;
     font-weight: normal;
-}
-
-p {
-    text-wrap: pretty;
 }
 
 main li:has(> input[type="checkbox"]) {
@@ -100,7 +95,6 @@ pre {
     background: var(--bg-subtle);
     border: 1px solid var(--border);
     padding: 0.1em 0.35em;
-    border-radius: 3px;
     max-width: 100%;
     overflow-wrap: anywhere;
 }
@@ -118,24 +112,15 @@ pre:hover .copy-btn {
 }
 
 .page-meta {
-    margin-top: 3em;
+    margin-top: 2.5em;
     padding-top: 0.75em;
-    border-top: 1px dashed var(--border);
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1em;
+    border-top: 1px solid var(--border);
     font-size: 0.8em;
 }
 
 .edit-link,
 .page-size {
     margin: 0;
-}
-
-.page-size {
-    text-align: right;
-    white-space: nowrap;
 }
 
 .pdf-viewer {
@@ -146,21 +131,12 @@ pre:hover .copy-btn {
 }
 
 @media (max-width: 900px) {
-    body {
-        font-size: 18px;
-    }
-
     main {
-        padding: 1.25em;
+        padding: 1rem;
     }
 
     main.pdf-mode {
         width: 100%;
-    }
-
-    .page-size {
-        white-space: normal;
-        overflow-wrap: anywhere;
     }
 
     .pdf-viewer {
@@ -170,16 +146,7 @@ pre:hover .copy-btn {
 
 @media (max-width: 600px) {
     main {
-        padding: 1em;
-    }
-
-    .page-meta {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .page-size {
-        text-align: left;
+        padding: 0.8rem;
     }
 
     .pdf-viewer {
