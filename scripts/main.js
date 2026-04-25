@@ -5,12 +5,25 @@ function loadScript(src) {
   return new Promise((resolve, reject) => {
     const s = document.createElement("script");
     s.src = src;
-    s.onload = () => { _loadedScripts.add(src); resolve(); };
+    s.onload = () => {
+      _loadedScripts.add(src);
+      resolve();
+    };
     s.onerror = reject;
     document.head.appendChild(s);
   });
 }
 let _mermaidReady = false;
+const SITE_NAME = "Preso";
+
+function getEditBaseUrl() {
+  const githubIoMatch = location.hostname.match(/^([^.]+)\.github\.io$/);
+  if (githubIoMatch && location.pathname) {
+    const repo = location.pathname.split("/").filter(Boolean)[0];
+    if (repo) return `https://github.com/${githubIoMatch[1]}/${repo}`;
+  }
+  return "https://github.com/munusshih/light-preso-2026";
+}
 
 // configure marked with syntax highlighting and mermaid support
 const renderer = new marked.Renderer();
@@ -141,7 +154,7 @@ function loadPDF(path) {
   applyPageJS(null);
   main.classList.add("pdf-mode");
   setNavActive(rawPath);
-  document.title = `${basename(rawPath)} — Critical AI Potluck`;
+  document.title = `${basename(rawPath)} — ${SITE_NAME}`;
 
   main.innerHTML = `<iframe class="pdf-viewer" src="${rawPath}" title="PDF viewer: ${basename(rawPath)}"></iframe>`;
   window.scrollTo(0, 0);
@@ -177,9 +190,7 @@ async function loadPage(slug) {
 
   applyPageCSS(data.css || null);
   applyPageJS(data.js || null);
-  document.title = data.title
-    ? `${data.title} — Critical AI Potluck`
-    : "Critical AI Potluck";
+  document.title = data.title ? `${data.title} — ${SITE_NAME}` : SITE_NAME;
   setNavActive(slug);
 
   const headerHtml = data.title ? `<h1>${data.title}</h1>` : "";
@@ -195,7 +206,7 @@ async function loadPage(slug) {
   const footerMeta = document.createElement("div");
   footerMeta.className = "page-meta";
 
-  const editUrl = `https://github.com/munusshih/critical-ai-potluck/edit/main/content/${slug}.md`;
+  const editUrl = `${getEditBaseUrl()}/edit/main/content/${slug}.md`;
   const editEl = document.createElement("p");
   editEl.className = "edit-link";
   editEl.innerHTML = `<a href="${editUrl}" target="_blank">edit this page on github ↗</a>`;

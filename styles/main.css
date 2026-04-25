@@ -1,4 +1,4 @@
-/* Critical AI Potluck — customize here */
+/* Preso — customize here */
 
 :root {
     --bg: rgb(255, 255, 241);
@@ -12,7 +12,6 @@
 }
 
 body {
-    display: flex;
     min-height: 100vh;
     margin: 0;
     font-family: serif;
@@ -23,75 +22,15 @@ body {
     overflow-x: hidden;
 }
 
-nav {
-    position: sticky;
-    top: 0;
-    align-self: flex-start;
-    height: 100vh;
-    overflow-y: auto;
-    width: 250px;
-    flex-shrink: 0;
-    padding: 2em 1em;
-    border-right: 1px solid var(--border);
-    font-family: monospace;
-    font-size: 0.85em;
-    line-height: 1.6;
-    background-image:
-        repeating-linear-gradient(45deg, rgba(17, 17, 17, 0.08) 0, rgba(17, 17, 17, 0.08) 1px, transparent 0, transparent 50%),
-        repeating-linear-gradient(-45deg, rgba(17, 17, 17, 0.08) 0, rgba(17, 17, 17, 0.08) 1px, transparent 0, transparent 50%);
-    background-size: 12px 12px;
-    background-color: var(--bg);
-}
-
-nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-nav li {
-    position: relative;
-    padding-left: 1.6em;
-}
-
-nav li::before {
-    content: '\251C\2500\2500\00A0';
-    position: absolute;
-    left: 0;
-    opacity: 0.4;
-}
-
-nav li:last-child::before {
-    content: '\2514\2500\2500\00A0';
-}
-
-/* nested folder indentation */
-nav ul ul {
-    margin-top: 0;
-}
-
-nav a {
-    color: var(--fg);
-    text-decoration: none;
-}
-
-nav a:hover {
-    text-decoration: underline;
-}
-
-nav a[aria-current] {
-    font-weight: bold;
-    text-decoration: underline;
-}
-
 main {
-    padding: 2em 2em;
+    padding: 2em;
+    margin: 0 auto;
     max-width: 900px;
 }
 
 main.pdf-mode {
     max-width: none;
-    width: calc(100vw - 250px);
+    width: 100vw;
     padding: 0;
 }
 
@@ -208,18 +147,7 @@ pre:hover .copy-btn {
 
 @media (max-width: 900px) {
     body {
-        flex-direction: column;
         font-size: 18px;
-    }
-
-    nav {
-        position: static;
-        height: auto;
-        overflow-y: visible;
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-        padding: 1em;
     }
 
     main {
