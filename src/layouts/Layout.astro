@@ -261,6 +261,8 @@ const { frontmatter } = Astro.props;
         transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
       }
 
+      .section-nav a:hover .nav-dot { transform: scale(1.15); }
+
       .section-nav a.active .nav-dot {
         background: #000;
         color: #fff;
@@ -347,6 +349,11 @@ const { frontmatter } = Astro.props;
           const dot = document.createElement('span');
           dot.className   = 'nav-dot';
           dot.textContent = String(i + 1);
+
+          a.addEventListener('click', (e) => {
+            e.preventDefault();
+            el.scrollIntoView({ behavior: 'smooth' });
+          });
 
           a.append(dot);
           list.appendChild(a);
