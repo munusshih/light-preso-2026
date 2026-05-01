@@ -7,16 +7,11 @@ import Window from "../components/Window.astro";
 import Portrait from "../components/Portrait.astro";
 import Spread from "../components/Spread.astro";
 import Section from "../components/Section.astro";
-import Tag from "../components/Tag.astro";
-import ClientWork from "../components/ClientWork.astro";
-import Sticker from "../components/Sticker.astro";
 import WorkList from "../components/WorkList.astro";
 import WorkItem from "../components/WorkItem.astro";
 import Carousel from "../components/Carousel.astro";
 import Random from "../components/Random.astro";
 import FridgeMagnets from "../components/FridgeMagnets.astro";
-import BookShelf from "../components/BookShelf.astro";
-import BookCover from "../components/BookCover.astro";
 
 <Section eyebrow="Meet Thesis Advisor">
 # Hi everyone!
@@ -83,38 +78,34 @@ I was able to produce the 50 Books x 50 Covers Exhibition this semester using my
 I work with many mission-aligned organizations and independent researchers to build design systems and digital work.
 
   <WorkList>
-    <WorkItem name="AIGA">
-      <Window src="https://imageofthestudio.athleticsnyc.io" title="AIGA" />
+    <WorkItem name="AIGA" href="https://www.aiga.org">
+      <Window src="https://imageofthestudio.athleticsnyc.io" title="Image of the Studio" />
     </WorkItem>
-    <WorkItem name="New Museum">
+    <WorkItem name="New Museum" href="https://newmuseum.org">
       <Window src="https://newmuseum.org" title="New Museum" />
     </WorkItem>
-    <WorkItem name="Processing Foundation">
+    <WorkItem name="Processing Foundation" href="https://processingfoundation.org">
       <Window
         src="https://processingfoundation.org/fellowships/fellowships-2025"
-        title="Processing Foundation"
+        title="Fellowships 2025"
       />
     </WorkItem>
-    <WorkItem name="Robert Blackburn Printmaking Workshop">
+    <WorkItem name="Robert Blackburn Printmaking Workshop" href="https://blackburnoralhistoryproject.org/">
       <Window
         src="https://blackburnoralhistoryproject.org/"
-        title="Robert Blackburn"
+        title="The Only Thing That Lasts"
       />
     </WorkItem>
-    <WorkItem name="Just Tech Fellow">
-      <Window src="https://todd-dev.free99.work/" title="Just Tech" />
+    <WorkItem name="Just Tech Fellow" href="https://www.ssrc.org/programs/just-tech/">
+      <Window src="https://todd-dev.free99.work/" title="Unearthing Air" />
     </WorkItem>
-    <WorkItem name="Gallery of Contemporary Art">
-      <Window
-        src="https://www.goca.gallery/"
-        title="Gallery of Contemporary Art"
-      />
+    <WorkItem name="Gallery of Contemporary Art" href="https://www.goca.gallery/">
+      <Window src="https://www.goca.gallery/" title="GOCA" />
     </WorkItem>
-    <WorkItem name="National Taiwan University" />
-    <WorkItem name="New York Review of Books" />
-    <WorkItem name="Secret Riso Club" />
-    <WorkItem name="Asian Labor Future Institute" />
-    <WorkItem name="Black Zine Fair" />
+    <WorkItem name="New York Review of Books" href="https://shop.nybooks.com/" />
+    <WorkItem name="Secret Riso Club" href="https://secretrisoclub.com" />
+    <WorkItem name="Asian Labor Future Institute" href="https://asianlaborfutures.substack.com" />
+    <WorkItem name="Black Zine Fair" href="https://blackzinefair.org" />
   </WorkList>
 </Section>
 
@@ -236,5 +227,29 @@ make, not the work that I want you to make.
 ## Email me at <a href="mailto:munus.shih@pratt.edu">munus.shih@pratt.edu</a>
 
 Or find me in the hallways of Pratt!
+
+</Section>
+
+<Section eyebrow="references" color="#f5f5f5">
+  ## Bibliography
+
+- "(4066.62, 62) — Munus Shih." [*munusshih.com*](https://www.munusshih.com/guansi). Accessed May 1, 2026.
+- "Archive - The Only Thing That Lasts." [*blackburnoralhistoryproject.org*](https://blackburnoralhistoryproject.org/). Accessed May 1, 2026.
+- "CoAssembly — Design Co-op." [*instagram.com/spon.act*](https://www.instagram.com/spon.act/). Accessed May 1, 2026.
+- "Design Future." [*designfuture.space*](https://designfuture.space). Accessed May 1, 2026.
+- "Duty Free — Munus Shih." [*munusshih.com*](https://www.munusshih.com/duty-free). Accessed May 1, 2026.
+- "Fellowships 2025." [*processingfoundation.org*](https://processingfoundation.org/fellowships/fellowships-2025). Accessed May 1, 2026.
+- "GOCA | Home." [*goca.gallery*](https://www.goca.gallery/). Accessed May 1, 2026.
+- "Graduate Studio: Technology A." [*tech-a.designfuture.space*](https://tech-a.designfuture.space). Accessed May 1, 2026.
+- "Graduate Studio: Visual Language B." [*vlb.munusshih.com*](https://vlb.munusshih.com). Accessed May 1, 2026.
+- "Image of the Studio — Data Designer." [*imageofthestudio.athleticsnyc.io*](https://imageofthestudio.athleticsnyc.io). Accessed May 1, 2026.
+- "Munus Shih — Portfolio." [*munusshih.com*](https://www.munusshih.com). Accessed May 1, 2026.
+- "New Museum." [*newmuseum.org*](https://newmuseum.org). Accessed May 1, 2026.
+- "p5.book." [*editor.p5js.org*](https://editor.p5js.org/munusshih/full/-JiQEqzeK). Accessed May 1, 2026.
+- "p5.zine." [*openprocessing.org*](https://openprocessing.org/sketch/1897656/embed/). Accessed May 1, 2026.
+- "Postcapitalist Desire: The Final Lectures." [*kyl.neocities.org*](https://kyl.neocities.org/books/%5BSOC%20FIS%5D%20postcapitalist%20desire%20-%20the%20final%20lectures.pdf). Accessed May 1, 2026.
+- "Thesis I (DES-796-07)." [*thesis-i.munusshih.com*](https://thesis-i.munusshih.com). Accessed May 1, 2026.
+- "Thesis II (DES-799-07)." [*thesis-ii.munusshih.com*](https://thesis-ii.munusshih.com). Accessed May 1, 2026.
+- "Unearthing Air." [*todd-dev.free99.work*](https://todd-dev.free99.work/). Accessed May 1, 2026.
 
 </Section>

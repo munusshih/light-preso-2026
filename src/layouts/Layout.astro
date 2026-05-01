@@ -1,275 +1,18 @@
 ---
+import '../styles/global.css';
 const { frontmatter } = Astro.props;
 ---
+
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>{frontmatter.title ?? 'Preso'}</title>
+    <title>{frontmatter.title ?? "Preso"}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link
       href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,400&family=Source+Code+Pro:wght@400;500;600&family=Caveat:wght@400;600&display=swap"
       rel="stylesheet"
     />
-    <style is:global>
-      *, *::before, *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        text-wrap: pretty;
-      }
-
-      :root {
-        --prose: min(58ch, 100% - clamp(3rem, 8vw, 6rem));
-        --c: #00AEEF;
-        --m: #EC008C;
-        --y: #FFF200;
-        --k: #231F20;
-      }
-
-      html {
-        background: #fff;
-        color: #000;
-        font-family: 'Be Vietnam Pro', system-ui, sans-serif;
-        font-size: 18px;
-        line-height: 1.7;
-        -webkit-font-smoothing: antialiased;
-      }
-
-      body {
-        display: grid;
-        grid-template-columns: 1fr var(--prose) 1fr;
-        row-gap: 0;
-        text-align: center;
-      }
-
-      body > * { grid-column: 2; }
-
-      /* Prose-column items get their own breathing room */
-      body > p,
-      body > ul,
-      body > ol,
-      body > h2,
-      body > blockquote {
-        padding-block: 4rem;
-      }
-
-      /* ─── Bare H1 (not in a Section): full-screen, cycles CMYK ─── */
-      h1 {
-        grid-column: 1 / -1;
-        min-height: 100svh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        font-size: clamp(5rem, 13vw, 22rem);
-        font-weight: 800;
-        letter-spacing: -0.05em;
-        line-height: 0.88;
-        text-align: center;
-        padding: 4rem clamp(2rem, 6vw, 8rem);
-        margin: 0;
-      }
-
-      body > h1:nth-of-type(4n+1) { background: var(--c); color: #000; }
-      body > h1:nth-of-type(4n+2) { background: var(--m); color: #fff; }
-      body > h1:nth-of-type(4n+3) { background: var(--y); color: #000; }
-      body > h1:nth-of-type(4n+4) { background: var(--k); color: #fff; }
-
-      /* Section component: full-bleed, no extra gap */
-      body > .preso-section {
-        grid-column: 1 / -1;
-        width: 100%;
-      }
-
-      /* ─── Typography ─── */
-      h2 {
-        font-size: clamp(2.2rem, 5vw, 5rem);
-        font-weight: 300;
-        letter-spacing: -0.05em;
-        line-height: 1.15;
-      }
-
-      p {
-        font-size: clamp(0.8rem, 1.3vw, 0.95rem);
-        font-weight: 500;
-        letter-spacing: 0.05em;
-        line-height: 1.75;
-        max-width: 40ch;
-        margin-inline: auto;
-        margin-top: 2rem;
-      }
-
-      /* ─── Unordered list — h2-scale, spotlight on scroll ─── */
-      ul {
-        padding-left: 0;
-        list-style: none;
-        text-align: center;
-      }
-      ul > li {
-        font-size: clamp(2.2rem, 5vw, 5rem);
-        font-weight: 300;
-        letter-spacing: -0.03em;
-        line-height: 1.2;
-        padding: 0.1em 0;
-        opacity: 0.15;
-        transition: opacity 0.35s ease;
-      }
-      ul > li.li-focus { opacity: 1; }
-
-      /* ─── Ordered list (editorial numbered) ─── */
-      ol {
-        list-style: none;
-        counter-reset: ol-counter;
-        padding-left: 0;
-        font-size: clamp(1.1rem, 2vw, 1.6rem);
-        line-height: 1.65;
-        text-align: left;
-      }
-      ol > li {
-        counter-increment: ol-counter;
-        display: grid;
-        grid-template-columns: 2.8em 1fr;
-        gap: 0.75rem;
-        align-items: baseline;
-        padding: 0.65rem 0;
-        border-bottom: 1px solid rgba(0,0,0,0.07);
-      }
-      ol > li:first-child { border-top: 1px solid rgba(0,0,0,0.07); }
-      ol > li::before {
-        content: counter(ol-counter, decimal-leading-zero);
-        font-family: 'Source Code Pro', monospace;
-        font-size: 0.65em;
-        font-weight: 600;
-        letter-spacing: 0.04em;
-        opacity: 0.3;
-        text-align: right;
-        align-self: center;
-      }
-
-      /* ─── Blockquote ─── */
-      blockquote {
-        border-left: 3px solid var(--c);
-        padding: 0.5rem 0 0.5rem 1.5rem;
-        text-align: left;
-        font-size: clamp(1.2rem, 2.2vw, 1.9rem);
-        font-style: italic;
-        font-weight: 300;
-        line-height: 1.55;
-        opacity: 0.8;
-      }
-
-      /* ─── Inline code ─── */
-      code {
-        font-family: 'Source Code Pro', monospace;
-        font-size: 0.82em;
-        background: rgba(0,0,0,0.05);
-        padding: 0.1em 0.35em;
-        border-radius: 3px;
-      }
-
-      /* ─── Links ─── */
-      a {
-        color: inherit;
-        text-underline-offset: 0.2em;
-      }
-
-      /* ─── hr = CMYK section divider ─── */
-      hr {
-        grid-column: 1 / -1;
-        width: 100%;
-        border: none;
-        height: 6px;
-        margin: 0;
-      }
-      body > hr:nth-of-type(4n+1) { background: var(--c); }
-      body > hr:nth-of-type(4n+2) { background: var(--m); }
-      body > hr:nth-of-type(4n+3) { background: var(--y); }
-      body > hr:nth-of-type(4n+4) { background: var(--k); }
-
-      /* ─── Individual media ─── */
-      body > .window-outer,
-      body > .portrait-frame,
-      body > .p5-window {
-        grid-column: 1 / -1;
-        justify-self: center;
-      }
-
-      /* ─── Layout wrappers ─── */
-      body > .layout-grid,
-      body > .layout-column,
-      body > .layout-spread,
-      body > .layout-clients,
-      body > .layout-random,
-      body > .work-list,
-      body > .carousel,
-      body > .book-shelf-outer,
-      body > .trait-list,
-      body > .fridge-magnets {
-        grid-column: 1 / -1;
-        width: 100%;
-        min-height: 80svh;
-      }
-
-      body > .carousel,
-      body > .book-shelf-outer,
-      body > .trait-list,
-      body > .fridge-magnets {
-        min-height: 0;
-      }
-
-      /* ─── Section nav: left edge, circles only ─── */
-      .section-nav {
-        position: fixed;
-        left: 1.5rem;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.55rem;
-        padding: 0.4rem 0;
-      }
-
-      .nav-toggle { display: none; }
-      .nav-list {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.55rem;
-      }
-
-      .section-nav a {
-        display: flex;
-        text-decoration: none;
-      }
-
-      .section-nav a .nav-dot {
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        background: #fff;
-        border: 1px solid rgba(0,0,0,0.18);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Source Code Pro', monospace;
-        font-size: 9px;
-        font-weight: 600;
-        color: #000;
-        transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
-      }
-
-      .section-nav a:hover .nav-dot { transform: scale(1.15); }
-
-      .section-nav a.active .nav-dot {
-        background: #000;
-        color: #fff;
-        border-color: #000;
-        transform: scale(1.15);
-      }
-    </style>
   </head>
   <body>
     <nav class="section-nav" aria-label="Sections">
@@ -285,15 +28,21 @@ const { frontmatter } = Astro.props;
             if (!entry.isIntersecting) continue;
             const iframe = entry.target as HTMLIFrameElement;
             if (!iframe.dataset.src || iframe.src) continue;
-            const win = iframe.closest<HTMLElement>('.window, .p5-window');
+            const win = iframe.closest<HTMLElement>(".window, .p5-window");
             iframe.src = iframe.dataset.src;
-            iframe.addEventListener('load', () => win?.classList.add('loaded'), { once: true });
+            iframe.addEventListener(
+              "load",
+              () => win?.classList.add("loaded"),
+              { once: true },
+            );
             iframeObserver.unobserve(iframe);
           }
         },
-        { rootMargin: '200px' }
+        { rootMargin: "200px" },
       );
-      for (const iframe of document.querySelectorAll<HTMLIFrameElement>('iframe[data-src]')) {
+      for (const iframe of document.querySelectorAll<HTMLIFrameElement>(
+        "iframe[data-src]",
+      )) {
         iframeObserver.observe(iframe);
       }
 
@@ -302,39 +51,45 @@ const { frontmatter } = Astro.props;
         (entries) => {
           for (const entry of entries) {
             if (!entry.isIntersecting) continue;
-            entry.target.classList.add('visible');
+            entry.target.classList.add("visible");
             revealObserver.unobserve(entry.target);
           }
         },
-        { rootMargin: '-40px' }
+        { rootMargin: "-40px" },
       );
-      for (const el of document.querySelectorAll('.portrait-frame')) {
+      for (const el of document.querySelectorAll(".portrait-frame")) {
         revealObserver.observe(el);
       }
 
       // ── List item spotlight ───────────────────────────────────────────────
-      const listItems = [...document.querySelectorAll<HTMLElement>('ul > li')];
+      const listItems = [...document.querySelectorAll<HTMLElement>(
+        "ul > li:not([data-nav-label='references'] ul > li)"
+      )].filter(li => !li.closest('[data-nav-label="references"]'));
       if (listItems.length) {
         function updateListFocus() {
           const mid = window.innerHeight * 0.5;
           for (const li of listItems) {
             const rect = li.getBoundingClientRect();
             const center = rect.top + rect.height / 2;
-            li.classList.toggle('li-focus', Math.abs(center - mid) < window.innerHeight * 0.22);
+            li.classList.toggle(
+              "li-focus",
+              Math.abs(center - mid) < window.innerHeight * 0.22,
+            );
           }
         }
-        window.addEventListener('scroll', updateListFocus, { passive: true });
+        window.addEventListener("scroll", updateListFocus, { passive: true });
         updateListFocus();
       }
 
       // ── Section nav ───────────────────────────────────────────────────────
-      const nav    = document.querySelector<HTMLElement>('.section-nav');
-      const list   = nav?.querySelector<HTMLElement>('.nav-list');
-      const toggle = nav?.querySelector<HTMLButtonElement>('.nav-toggle');
+      const nav = document.querySelector<HTMLElement>(".section-nav");
+      const list = nav?.querySelector<HTMLElement>(".nav-list");
+      const toggle = nav?.querySelector<HTMLButtonElement>(".nav-toggle");
 
       // Only track sections that have a named eyebrow label
-      const sections = [...document.querySelectorAll<HTMLElement>('.preso-section')]
-        .filter(el => el.dataset.navLabel);
+      const sections = [
+        ...document.querySelectorAll<HTMLElement>(".preso-section"),
+      ].filter((el) => el.dataset.navLabel);
 
       if (nav && list && sections.length) {
         sections.forEach((el, i) => {
@@ -342,26 +97,28 @@ const { frontmatter } = Astro.props;
 
           const label = el.dataset.navLabel || String(i + 1);
 
-          const a = document.createElement('a');
-          a.href  = `#${el.id}`;
+          const a = document.createElement("a");
+          a.href = `#${el.id}`;
           a.title = label;
 
-          const dot = document.createElement('span');
-          dot.className   = 'nav-dot';
+          const dot = document.createElement("span");
+          dot.className = "nav-dot";
           dot.textContent = String(i + 1);
 
-          a.addEventListener('click', (e) => {
+          a.addEventListener("click", (e) => {
             e.preventDefault();
-            el.scrollIntoView({ behavior: 'smooth' });
+            el.scrollIntoView({ behavior: "smooth" });
           });
 
           a.append(dot);
           list.appendChild(a);
         });
 
-        const links = [...list.querySelectorAll<HTMLAnchorElement>('a')];
+        const links = [...list.querySelectorAll<HTMLAnchorElement>("a")];
 
-        toggle?.addEventListener('click', () => list.classList.toggle('collapsed'));
+        toggle?.addEventListener("click", () =>
+          list.classList.toggle("collapsed"),
+        );
 
         function updateNav() {
           const mid = window.scrollY + window.innerHeight * 0.5;
@@ -369,10 +126,12 @@ const { frontmatter } = Astro.props;
           for (const s of sections) {
             if (s.getBoundingClientRect().top + window.scrollY <= mid) cur = s;
           }
-          links.forEach(a => a.classList.toggle('active', a.hash === `#${cur.id}`));
+          links.forEach((a) =>
+            a.classList.toggle("active", a.hash === `#${cur.id}`),
+          );
         }
 
-        window.addEventListener('scroll', updateNav, { passive: true });
+        window.addEventListener("scroll", updateNav, { passive: true });
         updateNav();
       }
     </script>

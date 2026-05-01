@@ -1,0 +1,271 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  text-wrap: pretty;
+}
+
+:root {
+  --prose: min(58ch, 100% - clamp(3rem, 8vw, 6rem));
+  --c: #00aeef;
+  --m: #ec008c;
+  --y: #fff200;
+  --k: #231f20;
+}
+
+html {
+  background: #fff;
+  color: #000;
+  font-family: "Be Vietnam Pro", system-ui, sans-serif;
+  font-size: 18px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  display: grid;
+  grid-template-columns: 1fr var(--prose) 1fr;
+  row-gap: 0;
+  text-align: center;
+}
+
+body > * {
+  grid-column: 2;
+}
+
+body > p,
+body > ul,
+body > ol,
+body > h2,
+body > blockquote {
+  padding-block: 4rem;
+}
+
+/* ─── Bare H1 (not in a Section): full-screen, cycles CMYK ─── */
+h1 {
+  grid-column: 1 / -1;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(5rem, 13vw, 22rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 0.88;
+  text-align: center;
+  padding: 4rem clamp(2rem, 6vw, 8rem);
+  margin: 0;
+}
+
+body > h1:nth-of-type(4n + 1) { background: var(--c); color: #000; }
+body > h1:nth-of-type(4n + 2) { background: var(--m); color: #fff; }
+body > h1:nth-of-type(4n + 3) { background: var(--y); color: #000; }
+body > h1:nth-of-type(4n + 4) { background: var(--k); color: #fff; }
+
+body > .preso-section {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+/* ─── Typography ─── */
+h2 {
+  font-size: clamp(2.2rem, 5vw, 5rem);
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  line-height: 1.15;
+}
+
+p {
+  font-size: clamp(0.8rem, 1.3vw, 0.95rem);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  line-height: 1.75;
+  max-width: 40ch;
+  margin-inline: auto;
+  margin-top: 2rem;
+}
+
+ul {
+  padding-left: 0;
+  list-style: none;
+  text-align: center;
+}
+ul > li {
+  font-size: clamp(2.2rem, 5vw, 5rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  padding: 0.1em 0;
+  opacity: 0.15;
+  transition: opacity 0.35s ease;
+}
+ul > li.li-focus {
+  opacity: 1;
+}
+
+/* bibliography list */
+.preso-section[data-nav-label="references"] ul > li {
+  font-size: clamp(0.85rem, 1.4vw, 1.05rem);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.8;
+  padding: 0.55em 0;
+  opacity: 1;
+  border-bottom: 1px solid #000;
+  text-align: left;
+  transition: none;
+  max-width: 64ch;
+}
+.preso-section[data-nav-label="references"] ul > li:first-child {
+  border-top: 1px solid #000;
+}
+
+/* ─── Ordered list (editorial numbered) ─── */
+ol {
+  list-style: none;
+  counter-reset: ol-counter;
+  padding-left: 0;
+  font-size: clamp(0.75rem, 1.2vw, 0.95rem);
+  line-height: 1.65;
+  text-align: left;
+}
+ol > li {
+  counter-increment: ol-counter;
+  display: grid;
+  grid-template-columns: 2.8em 1fr;
+  gap: 0.75rem;
+  align-items: baseline;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+ol > li:first-child {
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+}
+ol > li::before {
+  content: counter(ol-counter, decimal-leading-zero);
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.65em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 0.3;
+  text-align: right;
+  align-self: center;
+}
+
+blockquote {
+  border-left: 3px solid var(--c);
+  padding: 0.5rem 0 0.5rem 1.5rem;
+  text-align: left;
+  font-size: clamp(1.2rem, 2.2vw, 1.9rem);
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.55;
+  opacity: 0.8;
+}
+
+code {
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.82em;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+}
+
+hr {
+  grid-column: 1 / -1;
+  width: 100%;
+  border: none;
+  height: 6px;
+  margin: 0;
+}
+body > hr:nth-of-type(4n + 1) { background: var(--c); }
+body > hr:nth-of-type(4n + 2) { background: var(--m); }
+body > hr:nth-of-type(4n + 3) { background: var(--y); }
+body > hr:nth-of-type(4n + 4) { background: var(--k); }
+
+body > .window-outer,
+body > .portrait-frame,
+body > .p5-window {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
+body > .layout-grid,
+body > .layout-column,
+body > .layout-spread,
+body > .layout-clients,
+body > .layout-random,
+body > .work-list,
+body > .carousel,
+body > .book-shelf-outer,
+body > .trait-list,
+body > .fridge-magnets {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: 80svh;
+}
+
+body > .carousel,
+body > .book-shelf-outer,
+body > .trait-list,
+body > .fridge-magnets {
+  min-height: 0;
+}
+
+/* ─── Section nav ─── */
+.section-nav {
+  position: fixed;
+  left: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0;
+}
+
+.nav-toggle { display: none; }
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.section-nav a {
+  display: flex;
+  text-decoration: none;
+}
+
+.section-nav a .nav-dot {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Source Code Pro", monospace;
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.section-nav a:hover .nav-dot { transform: scale(1.15); }
+
+.section-nav a.active .nav-dot {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+  transform: scale(1.15);
+}
