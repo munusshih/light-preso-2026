@@ -1,0 +1,68 @@
+---
+interface Props {
+  eyebrow?: string;
+  color?: string;
+  textColor?: string;
+  condensed?: boolean;
+}
+const { eyebrow, color = '#fff', textColor = '#000', condensed = false } = Astro.props;
+---
+
+<section
+  class={`preso-section${condensed ? ' section-condensed' : ''}`}
+  style={`background:${color};color:${textColor}`}
+  data-nav-label={eyebrow ?? ''}
+>
+  {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+  <slot />
+</section>
+
+<style>
+  .preso-section {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    padding: 4rem clamp(2rem, 6vw, 8rem);
+    text-align: center;
+  }
+
+  /* Reset margins on children — gap handles spacing */
+  .preso-section :global(p),
+  .preso-section :global(h2),
+  .preso-section :global(h3) {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  /* Full-bleed children: expand beyond horizontal padding */
+  .preso-section :global(.carousel),
+  .preso-section :global(.work-list),
+  .preso-section :global(.trait-list) {
+    align-self: stretch;
+    width: calc(100% + 2 * clamp(2rem, 6vw, 8rem));
+    margin-inline: calc(-1 * clamp(2rem, 6vw, 8rem));
+  }
+
+  .section-condensed {
+    min-height: 0;
+    padding: 3rem clamp(2rem, 6vw, 8rem);
+  }
+
+  /* Override global h1 full-screen behavior when nested inside a section */
+  .preso-section :global(h1) {
+    min-height: 0;
+    padding: 0;
+    grid-column: unset;
+  }
+
+  .eyebrow {
+    font-size: clamp(0.9rem, 2vw, 1.4rem);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    opacity: 0.45;
+  }
+</style>

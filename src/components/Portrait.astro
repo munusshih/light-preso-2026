@@ -1,0 +1,126 @@
+---
+interface Props {
+  src: string;
+  alt?: string;
+  caption?: string;
+  captionHref?: string;
+}
+const { src, alt = '', caption = '', captionHref } = Astro.props;
+---
+
+<figure class="portrait-frame">
+  <img src={src} alt={alt} loading="lazy" />
+  {caption && (
+    <figcaption>
+      {captionHref
+        ? <a href={captionHref} target="_blank" rel="noopener noreferrer">{caption}</a>
+        : caption}
+    </figcaption>
+  )}
+</figure>
+
+<style>
+  .portrait-frame {
+    display: inline-block;
+    padding: 12px 12px 0;
+    background: #fff;
+    position: relative;
+    opacity: 0;
+    transform: translateY(30px);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    margin-bottom: -5rem;
+    z-index: 2;
+    cursor: grab;
+    will-change: transform;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .portrait-frame:active { cursor: grabbing; }
+
+  .portrait-frame.visible {
+    animation: portrait-reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes portrait-reveal {
+    from { opacity: 0; transform: translateY(30px) rotate(-1.5deg); }
+    to   { opacity: 1; transform: translateY(0)    rotate(-1.5deg); }
+  }
+
+  img {
+    display: block;
+    height: clamp(320px, 50vh, 520px);
+    width: auto;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    object-position: center top;
+    pointer-events: none;
+  }
+
+  figcaption {
+    width: 0;
+    min-width: 100%;
+    padding: 0.55rem 0.25rem 0.65rem;
+    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 400;
+    font-style: italic;
+    color: #000;
+    letter-spacing: 0.01em;
+    text-align: left;
+    line-height: 1.45;
+    opacity: 0.55;
+    overflow-wrap: break-word;
+  }
+
+  figcaption a {
+    color: inherit;
+    text-underline-offset: 0.2em;
+  }
+</style>
+
+<script>
+  for (const frame of document.querySelectorAll<HTMLElement>('.portrait-frame')) {
+    let tx = 0, ty = 0, rot = -1.5;
+    let startX = 0, startY = 0;
+
+    function applyTransform(scale = 1, instant = false) {
+      frame.style.transition = instant
+        ? 'none'
+        : 'transform 0.5s cubic-bezier(0.34,1.5,0.64,1), box-shadow 0.35s ease';
+      frame.style.transform = `translate(${tx}px,${ty}px) rotate(${rot}deg) scale(${scale})`;
+    }
+
+    // Once the reveal animation ends, hand control to JS
+    frame.addEventListener('animationend', () => {
+      frame.style.opacity = '1';
+      frame.style.animation = 'none';
+      applyTransform(1, true);
+    }, { once: true });
+
+    frame.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      frame.setPointerCapture(e.pointerId);
+      startX = e.clientX - tx;
+      startY = e.clientY - ty;
+      frame.style.transition = 'box-shadow 0.2s';
+      frame.style.boxShadow = '0 18px 50px rgba(0,0,0,0.22)';
+      frame.style.zIndex = '100';
+      applyTransform(1.05, true);
+    });
+
+    frame.addEventListener('pointermove', (e) => {
+      if (!frame.hasPointerCapture(e.pointerId)) return;
+      tx = e.clientX - startX;
+      ty = e.clientY - startY;
+      frame.style.transform = `translate(${tx}px,${ty}px) rotate(${rot}deg) scale(1.05)`;
+    });
+
+    frame.addEventListener('pointerup', () => {
+      // Randomise the resting tilt on drop
+      rot = -8 + Math.random() * 16;
+      frame.style.boxShadow = '0 4px 24px rgba(0,0,0,0.10)';
+      applyTransform(1);
+    });
+  }
+</script>

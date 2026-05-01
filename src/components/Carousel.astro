@@ -1,0 +1,114 @@
+---
+interface Props {
+  caption?: string;
+}
+const { caption } = Astro.props;
+---
+
+<div class="carousel">
+  <div class="carousel-track">
+    <slot />
+  </div>
+  {caption && <p class="carousel-caption">{caption}</p>}
+</div>
+
+<style>
+  .carousel {
+    width: 100%;
+    user-select: none;
+  }
+
+  .carousel-track {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    cursor: grab;
+  }
+  .carousel-track::-webkit-scrollbar { display: none; }
+  .carousel-track:active { cursor: grabbing; }
+
+  .carousel-track > :global(*) {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+
+  .carousel-caption {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.45;
+    text-align: center;
+    padding: 0.5rem;
+    margin: 0;
+  }
+</style>
+
+<script>
+  for (const track of document.querySelectorAll<HTMLElement>('.carousel-track')) {
+    let startX = 0, startScroll = 0;
+    let lastX = 0, lastT = 0, velX = 0;
+    let rafId = 0;
+
+    function disableChildren() {
+      for (const el of track.querySelectorAll<HTMLElement>('iframe, .screen-overlay, .media-fill')) {
+        el.style.pointerEvents = 'none';
+      }
+    }
+    function enableChildren() {
+      for (const el of track.querySelectorAll<HTMLElement>('iframe, .screen-overlay, .media-fill')) {
+        el.style.pointerEvents = '';
+      }
+    }
+
+    track.addEventListener('pointerdown', (e) => {
+      cancelAnimationFrame(rafId);
+      startX = e.clientX;
+      startScroll = track.scrollLeft;
+      lastX = e.clientX;
+      lastT = performance.now();
+      velX = 0;
+      track.setPointerCapture(e.pointerId);
+      // Disable snap so it doesn't fight the drag on every frame
+      track.style.scrollSnapType = 'none';
+      disableChildren();
+    });
+
+    track.addEventListener('pointermove', (e) => {
+      if (!track.hasPointerCapture(e.pointerId)) return;
+      const now = performance.now();
+      const dt = now - lastT;
+      if (dt > 0) velX = (lastX - e.clientX) / dt; // px/ms
+      lastX = e.clientX;
+      lastT = now;
+      track.scrollLeft = startScroll - (e.clientX - startX);
+    });
+
+    function endDrag() {
+      enableChildren();
+      // Apply momentum then re-enable snap so it settles on a slide
+      let v = velX * 14; // scale to ~px/frame at 60fps
+      function coast() {
+        if (Math.abs(v) < 0.3) {
+          track.style.scrollSnapType = '';
+          return;
+        }
+        track.scrollLeft += v;
+        v *= 0.88;
+        rafId = requestAnimationFrame(coast);
+      }
+      rafId = requestAnimationFrame(coast);
+    }
+
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', () => {
+      enableChildren();
+      track.style.scrollSnapType = '';
+    });
+  }
+</script>

@@ -1,0 +1,52 @@
+---
+// Horizontal-scroll reel for client work — put Window or Portrait components inside.
+// Drag/scroll sideways to browse.
+---
+
+<div class="layout-clients">
+  <slot />
+</div>
+
+<style>
+  .layout-clients {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 3rem clamp(2rem, 5vw, 4rem) 5rem;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    cursor: grab;
+  }
+  .layout-clients::-webkit-scrollbar { display: none; }
+  .layout-clients:active { cursor: grabbing; }
+  .layout-clients > * {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+</style>
+
+<script>
+  for (const reel of document.querySelectorAll<HTMLElement>('.layout-clients')) {
+    let isDown = false, startX = 0, scrollLeft = 0;
+
+    reel.addEventListener('pointerdown', (e) => {
+      // only drag the reel itself, not windows inside it
+      if ((e.target as HTMLElement).closest('.window-outer, .window-bar')) return;
+      isDown = true;
+      reel.setPointerCapture(e.pointerId);
+      startX = e.pageX - reel.offsetLeft;
+      scrollLeft = reel.scrollLeft;
+    });
+
+    reel.addEventListener('pointermove', (e) => {
+      if (!isDown) return;
+      const x = e.pageX - reel.offsetLeft;
+      reel.scrollLeft = scrollLeft - (x - startX);
+    });
+
+    reel.addEventListener('pointerup', () => { isDown = false; });
+  }
+</script>

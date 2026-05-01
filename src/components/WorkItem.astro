@@ -1,0 +1,29 @@
+---
+// A list item that shows an org name + optional window preview.
+// Spotlight opacity (li-focus) applies to the whole item including the window.
+interface Props {
+  name: string;
+}
+const { name } = Astro.props;
+---
+
+<li class="work-item">
+  <span class="work-item-name">{name}</span>
+  <slot />
+</li>
+
+<style>
+  .work-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.75rem;
+    text-align: center;
+    /* font-size, opacity, transition come from global ul > li rules */
+  }
+
+  .work-item-name {
+    /* inherits li's large font-size and spotlight opacity */
+    line-height: 1;
+  }
+</style>

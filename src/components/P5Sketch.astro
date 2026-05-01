@@ -1,0 +1,110 @@
+---
+// Embed a local p5.js sketch by pointing src to an Astro sketch page.
+// e.g. <P5Sketch src="/sketches/my-sketch" width={640} height={480} title="My Sketch" />
+interface Props {
+  src: string;
+  width?: number;
+  height?: number;
+  title?: string;
+}
+const { src, width = 640, height = 480, title = '' } = Astro.props;
+const displayTitle = title || src.split('/').pop() || 'sketch';
+---
+
+<div class="window p5-window" style={`--w:${width}px;--h:${height}px`}>
+  <div class="window-bar">
+    <span class="window-title">{displayTitle}</span>
+  </div>
+  <div class="screen">
+    <div class="screen-overlay">
+      <span class="screen-dot"></span>
+    </div>
+    <!-- iframe sized to the sketch canvas — no desktop scaling -->
+    <iframe data-src={src} style={`width:${width}px;height:${height}px`}></iframe>
+  </div>
+</div>
+
+<style>
+  .p5-window {
+    display: inline-flex;
+    flex-direction: column;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+    background: #111;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    will-change: transform;
+    vertical-align: top;
+  }
+  .p5-window:active { cursor: grabbing; }
+
+  .window-bar {
+    display: flex;
+    align-items: center;
+    padding: 7px 12px;
+    background: #111;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    flex-shrink: 0;
+  }
+  .window-title {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.35);
+    font-family: system-ui, sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .screen {
+    position: relative;
+    width: var(--w);
+    height: var(--h);
+    background: #0a0a0a;
+    overflow: hidden;
+  }
+  .screen-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0a0a0a;
+    z-index: 1;
+    transition: opacity 0.3s 0.1s;
+  }
+  .screen-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #333;
+    animation: dot-blink 1.4s ease-in-out infinite;
+  }
+  @keyframes dot-blink {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50%       { opacity: 1;   transform: scale(1.4); }
+  }
+  iframe {
+    display: block;
+    border: none;
+    background: white;
+    opacity: 0;
+  }
+  .p5-window.loaded .screen-overlay {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .p5-window.loaded iframe {
+    animation: crt-on 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  @keyframes crt-on {
+    0%   { opacity: 1; transform: scaleY(0.003); filter: brightness(8); }
+    8%   {             transform: scaleY(0.003); filter: brightness(8); }
+    40%  {             transform: scaleY(1);     filter: brightness(1.6) blur(1px); }
+    70%  {                                       filter: brightness(1.1); }
+    100% { opacity: 1; transform: scaleY(1);     filter: brightness(1); }
+  }
+</style>

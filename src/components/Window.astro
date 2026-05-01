@@ -1,0 +1,255 @@
+---
+interface Props {
+  src: string;
+  size?: 'medium' | 'large';
+  title?: string;
+  note?: string;
+  noteColor?: 'yellow' | 'pink' | 'green' | 'blue' | 'orange';
+  notePosition?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+  type?: 'auto' | 'iframe' | 'image' | 'video';
+}
+const { src, size = 'medium', title = '', note, noteColor = 'yellow', type = 'auto' } = Astro.props;
+const positions = ['top-right', 'top-left', 'bottom-right', 'bottom-left'] as const;
+const notePosition = Astro.props.notePosition ?? positions[Math.floor(Math.random() * positions.length)];
+
+// Normalize src — skip https prepend for local paths
+const isLocal = src.startsWith('/');
+const normalizedSrc = isLocal || /^https?:\/\//i.test(src) ? src : `https://${src}`;
+
+// Auto-detect content type
+const isImageSrc = /\.(jpg|jpeg|png|gif|webp|svg|avif)(\?.*)?$/i.test(normalizedSrc);
+const isVideoSrc = /\.(mp4|webm|mov|ogg|avi)(\?.*)?$/i.test(normalizedSrc);
+const resolvedType = type === 'auto'
+  ? (isImageSrc ? 'image' : isVideoSrc ? 'video' : 'iframe')
+  : type;
+
+// Domain or filename for bar title
+const domain = isLocal
+  ? normalizedSrc.split('/').filter(Boolean).pop() ?? normalizedSrc
+  : (() => { try { return new URL(normalizedSrc).hostname; } catch { return normalizedSrc; } })();
+const displayTitle = title ? `${title} — ${domain}` : domain;
+
+const DESKTOP_W = 1440;
+const dims = ({ medium: { w: 900, h: 600 }, large: { w: 1200, h: 800 } } as Record<string,{w:number,h:number}>)[size] ?? { w: 900, h: 600 };
+const scale  = dims.w / DESKTOP_W;
+const frameH = Math.round(dims.h / scale);
+
+const noteColors: Record<string, string> = {
+  yellow: '#FFF07C', pink: '#FFB3C6', green: '#B8F2B1', blue: '#B3D5FF', orange: '#FFD4A3',
+};
+const noteBg = noteColors[noteColor] ?? noteColors.yellow;
+---
+
+<div class="window-outer">
+  {note && (
+    <div class={`sticky-note note-${notePosition}`} style={`background:${noteBg}`}>
+      {note}
+    </div>
+  )}
+  <div
+    class={`window window-${size}`}
+    style={`--w:${dims.w}px;--h:${dims.h}px;--scale:${scale};--frame-h:${frameH}px`}
+  >
+    <div class="window-bar">
+      <span class="window-dots">
+        <span></span><span></span><span></span>
+      </span>
+      <span class="window-title">{displayTitle}</span>
+      <a class="window-open" href={normalizedSrc} target="_blank" rel="noopener noreferrer" title="Open in new tab" onclick="event.stopPropagation()">↗</a>
+    </div>
+    <div class="screen">
+      {resolvedType === 'iframe' && (
+        <>
+          <div class="screen-overlay">
+            <span class="screen-dot"></span>
+          </div>
+          <div class="iframe-scaler">
+            <iframe data-src={normalizedSrc}></iframe>
+          </div>
+        </>
+      )}
+      {resolvedType === 'image' && (
+        <img src={normalizedSrc} alt={title || domain} class="media-fill" />
+      )}
+      {resolvedType === 'video' && (
+        <video src={normalizedSrc} autoplay loop muted playsinline class="media-fill"></video>
+      )}
+    </div>
+  </div>
+</div>
+
+<style>
+  .window-outer {
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    will-change: transform;
+  }
+  .window-outer:active { cursor: grabbing; }
+
+  .window {
+    display: inline-flex;
+    flex-direction: column;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06);
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+  }
+
+  .window-outer:hover .window {
+    box-shadow: 0 8px 30px rgba(0,0,0,0.14), 0 0 0 0.5px rgba(0,0,0,0.06);
+    transform: translateY(-2px);
+  }
+
+  .sticky-note {
+    position: absolute;
+    z-index: 10;
+    padding: 0.6rem 0.9rem;
+    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+    font-size: clamp(0.85rem, 1.4vw, 1.1rem);
+    font-weight: 600;
+    line-height: 1.4;
+    max-width: 15rem;
+    white-space: pre-line;
+    pointer-events: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+  }
+
+  .note-top-right    { top: -14px;    right: 1.25rem; transform: rotate( 2deg); }
+  .note-top-left     { top: -14px;    left:  1.25rem; transform: rotate(-2deg); }
+  .note-bottom-right { bottom: -14px; right: 1.25rem; transform: rotate(-1.5deg); }
+  .note-bottom-left  { bottom: -14px; left:  1.25rem; transform: rotate( 1.5deg); }
+
+  .sticky-note { transition: transform 0.25s cubic-bezier(0.34, 1.5, 0.64, 1); }
+  .window-outer:hover .note-top-right    { transform: rotate( 4deg) scale(1.04); }
+  .window-outer:hover .note-top-left     { transform: rotate(-4deg) scale(1.04); }
+  .window-outer:hover .note-bottom-right { transform: rotate(-3deg) scale(1.04); }
+  .window-outer:hover .note-bottom-left  { transform: rotate( 3deg) scale(1.04); }
+
+  .window-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 8px 12px;
+    background: #f0f0f0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+  }
+
+  .window-dots { display: flex; gap: 5px; flex-shrink: 0; }
+  .window-dots span {
+    display: block; width: 11px; height: 11px; border-radius: 50%; background: #d0d0d0;
+  }
+  .window-dots span:nth-child(1) { background: #ff5f57; }
+  .window-dots span:nth-child(2) { background: #febc2e; }
+  .window-dots span:nth-child(3) { background: #28c840; }
+
+  .window-title {
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.38);
+    font-family: 'Source Code Pro', monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.03em;
+    flex: 1;
+  }
+
+  .window-open {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.35);
+    text-decoration: none;
+    padding: 0 2px;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .window-open:hover { color: rgba(0, 0, 0, 0.75); }
+
+  .screen {
+    position: relative;
+    width: var(--w);
+    height: var(--h);
+    background: #fafafa;
+    overflow: hidden;
+  }
+
+  /* Image and video: fill the screen area */
+  .media-fill {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: none;
+  }
+
+  .screen-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+    z-index: 1;
+    transition: opacity 0.4s 0.1s;
+  }
+  .screen-dot {
+    width: 5px; height: 5px; border-radius: 50%; background: #bbb;
+    animation: dot-blink 1.4s ease-in-out infinite;
+  }
+  @keyframes dot-blink {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50%       { opacity: 1;   transform: scale(1.4); }
+  }
+
+  .iframe-scaler {
+    position: absolute;
+    top: 0; left: 0;
+    width: 1440px;
+    height: var(--frame-h);
+    transform: scale(var(--scale));
+    transform-origin: top left;
+  }
+
+  iframe {
+    display: block; width: 100%; height: 100%;
+    border: none; background: white; opacity: 0;
+  }
+
+  .window.loaded .screen-overlay { opacity: 0; pointer-events: none; }
+  .window.loaded iframe { animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<script>
+  for (const outer of document.querySelectorAll<HTMLElement>('.window-outer')) {
+    // Inside a carousel the track handles drag-scroll; don't let the bar steal pointer capture
+    if (outer.closest('.carousel-track')) continue;
+
+    const bar = outer.querySelector<HTMLElement>('.window-bar')!;
+    let cx = 0, cy = 0, startX = 0, startY = 0;
+
+    bar.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      bar.setPointerCapture(e.pointerId);
+      startX = e.clientX - cx;
+      startY = e.clientY - cy;
+      outer.style.zIndex = String(Date.now());
+    });
+
+    bar.addEventListener('pointermove', (e) => {
+      if (!bar.hasPointerCapture(e.pointerId)) return;
+      cx = e.clientX - startX;
+      cy = e.clientY - startY;
+      outer.style.translate = `${cx}px ${cy}px`;
+    });
+  }
+</script>

@@ -1,0 +1,55 @@
+---
+interface Props {
+  terms: string; // comma-separated list of terms
+}
+const { terms } = Astro.props;
+const items = terms.split(',').map(t => t.trim()).filter(Boolean);
+
+const palette = [
+  { bg: '#FFF200', fg: '#000' },
+  { bg: '#fff',    fg: '#000' },
+  { bg: '#00AEEF', fg: '#000' },
+  { bg: '#EC008C', fg: '#fff' },
+  { bg: '#231F20', fg: '#fff' },
+];
+---
+
+<div class="fridge-magnets">
+  {items.map((term, i) => {
+    const c = palette[i % palette.length];
+    const r = (i % 2 === 0 ? -1 : 1) * (1 + (i % 3));
+    return (
+      <span class="magnet" style={`background:${c.bg};color:${c.fg};rotate:${r}deg`}>
+        {term}
+      </span>
+    );
+  })}
+</div>
+
+<style>
+  .fridge-magnets {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 5rem clamp(2rem, 6vw, 8rem);
+  }
+
+  .magnet {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3em 0.75em;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    letter-spacing: -0.02em;
+    border-radius: 3px;
+    box-shadow:
+      0 2px 0 rgba(0,0,0,0.18),
+      0 4px 14px rgba(0,0,0,0.15),
+      inset 0 1px 0 rgba(255,255,255,0.3);
+    white-space: nowrap;
+  }
+</style>

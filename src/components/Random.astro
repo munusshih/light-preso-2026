@@ -1,0 +1,42 @@
+---
+// Scatters children at random-feeling rotations and offsets — thrown on a desk.
+// Rotations and offsets are seeded at build time so they're stable between renders.
+const seed = [
+  { r: -12, tx:  10, ty: -20 },
+  { r:   7, tx: -15, ty:  25 },
+  { r: -4,  tx:  30, ty: -10 },
+  { r:  15, tx: -25, ty:  15 },
+  { r: -9,  tx:  20, ty:  30 },
+  { r:   3, tx: -10, ty: -25 },
+  { r: -16, tx:  15, ty:  10 },
+  { r:   8, tx: -30, ty: -15 },
+];
+---
+
+<div class="layout-random">
+  <slot />
+</div>
+
+<style define:vars={{ ...Object.fromEntries(seed.flatMap((s, i) => [
+  [`r${i}`, `${s.r}deg`], [`tx${i}`, `${s.tx}px`], [`ty${i}`, `${s.ty}px`]
+])) }}>
+  .layout-random {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    gap: clamp(2rem, 5vw, 4rem);
+    padding: 6rem clamp(2rem, 6vw, 8rem) 8rem;
+    position: relative;
+  }
+
+  .layout-random > *:nth-child(1)  { transform: rotate(var(--r0)) translate(var(--tx0), var(--ty0)); }
+  .layout-random > *:nth-child(2)  { transform: rotate(var(--r1)) translate(var(--tx1), var(--ty1)); }
+  .layout-random > *:nth-child(3)  { transform: rotate(var(--r2)) translate(var(--tx2), var(--ty2)); }
+  .layout-random > *:nth-child(4)  { transform: rotate(var(--r3)) translate(var(--tx3), var(--ty3)); }
+  .layout-random > *:nth-child(5)  { transform: rotate(var(--r4)) translate(var(--tx4), var(--ty4)); }
+  .layout-random > *:nth-child(6)  { transform: rotate(var(--r5)) translate(var(--tx5), var(--ty5)); }
+  .layout-random > *:nth-child(7)  { transform: rotate(var(--r6)) translate(var(--tx6), var(--ty6)); }
+  .layout-random > *:nth-child(8)  { transform: rotate(var(--r7)) translate(var(--tx7), var(--ty7)); }
+</style>

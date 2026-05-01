@@ -1,0 +1,35 @@
+---
+// Windows scattered like papers on a desk.
+// Pre-tilted via nth-child — drag from the title bar to rearrange freely.
+---
+
+<div class="layout-spread">
+  <slot />
+</div>
+
+<style>
+  .layout-spread {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-end;
+    align-content: center;
+    gap: clamp(2.5rem, 5vw, 5rem);
+    padding: 5rem clamp(2rem, 5vw, 4rem) 7rem;
+    position: relative;
+  }
+
+  /* Staggered rotations only — positive gap handles spacing */
+  .layout-spread > *:nth-child(1)  { transform: rotate(-3deg); }
+  .layout-spread > *:nth-child(2)  { transform: rotate( 2deg); }
+  .layout-spread > *:nth-child(3)  { transform: rotate(-1.5deg); }
+  .layout-spread > *:nth-child(4)  { transform: rotate( 3.5deg); }
+  .layout-spread > *:nth-child(5)  { transform: rotate(-2deg); }
+  .layout-spread > *:nth-child(6)  { transform: rotate( 1.5deg); }
+  .layout-spread > *:nth-child(7)  { transform: rotate(-4deg); }
+  .layout-spread > *:nth-child(8)  { transform: rotate( 2.5deg); }
+  .layout-spread > *:nth-child(9)  { transform: rotate(-1deg); }
+  .layout-spread > *:nth-child(10) { transform: rotate( 3deg); }
+  .layout-spread > *:nth-child(11) { transform: rotate(-2.5deg); }
+  .layout-spread > *:nth-child(12) { transform: rotate( 1deg); }
+</style>

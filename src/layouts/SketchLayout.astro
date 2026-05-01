@@ -1,0 +1,31 @@
+---
+// Minimal blank layout for p5.js sketch pages.
+// Usage in src/pages/sketches/my-sketch.astro:
+//
+//   ---
+//   import SketchLayout from '../../layouts/SketchLayout.astro';
+//   ---
+//   <SketchLayout>
+//     <script is:inline>
+//       new p5(p => {
+//         p.setup = () => p.createCanvas(windowWidth, windowHeight);
+//         p.draw = () => { p.background(0); p.circle(p.mouseX, p.mouseY, 40); };
+//       });
+//     </script>
+//   </SketchLayout>
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #fff; }
+      canvas { display: block; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/p5/lib/p5.min.js"></script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
