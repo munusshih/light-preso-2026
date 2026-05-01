@@ -16,26 +16,32 @@ const { frontmatter } = Astro.props;
   </head>
   <body>
     <nav class="section-nav" aria-label="Sections">
-      <button class="nav-toggle" aria-label="Toggle navigation">nav</button>
+      <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
       <div class="nav-list"></div>
     </nav>
     <slot />
     <script>
-      // ── Lazy-load iframes ─────────────────────────────────────────────────
+      // ── Progressive iframe loading ────────────────────────────────────────
       const iframeObserver = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
-            if (!entry.isIntersecting) continue;
             const iframe = entry.target as HTMLIFrameElement;
-            if (!iframe.dataset.src || iframe.src) continue;
             const win = iframe.closest<HTMLElement>(".window, .p5-window");
-            iframe.src = iframe.dataset.src;
-            iframe.addEventListener(
-              "load",
-              () => win?.classList.add("loaded"),
-              { once: true },
-            );
-            iframeObserver.unobserve(iframe);
+            if (entry.isIntersecting) {
+              if (iframe.dataset.src && !iframe.getAttribute("src")) {
+                iframe.src = iframe.dataset.src;
+                iframe.addEventListener(
+                  "load",
+                  () => win?.classList.add("loaded"),
+                  { once: true },
+                );
+              }
+            } else {
+              if (iframe.getAttribute("src")) {
+                iframe.removeAttribute("src");
+                win?.classList.remove("loaded");
+              }
+            }
           }
         },
         { rootMargin: "200px" },
@@ -105,20 +111,28 @@ const { frontmatter } = Astro.props;
           dot.className = "nav-dot";
           dot.textContent = String(i + 1);
 
+          const labelEl = document.createElement("span");
+          labelEl.className = "nav-label";
+          labelEl.textContent = label;
+
           a.addEventListener("click", (e) => {
             e.preventDefault();
             el.scrollIntoView({ behavior: "smooth" });
+            // close hamburger menu on mobile
+            list.classList.remove("open");
+            if (toggle) toggle.textContent = "☰";
           });
 
-          a.append(dot);
+          a.append(dot, labelEl);
           list.appendChild(a);
         });
 
         const links = [...list.querySelectorAll<HTMLAnchorElement>("a")];
 
-        toggle?.addEventListener("click", () =>
-          list.classList.toggle("collapsed"),
-        );
+        toggle?.addEventListener("click", () => {
+          const isOpen = list.classList.toggle("open");
+          toggle.textContent = isOpen ? "✕" : "☰";
+        });
 
         function updateNav() {
           const mid = window.scrollY + window.innerHeight * 0.5;

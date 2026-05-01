@@ -49,6 +49,7 @@ const noteBg = noteColors[noteColor] ?? noteColors.yellow;
   <div
     class={`window window-${size}`}
     style={`--w:${dims.w}px;--h:${dims.h}px;--scale:${scale};--frame-h:${frameH}px`}
+    data-design-h={dims.h}
   >
     <div class="window-bar">
       <span class="window-dots">
@@ -221,6 +222,25 @@ const noteBg = noteColors[noteColor] ?? noteColors.yellow;
     border: none; background: white; opacity: 0;
   }
 
+  @media (max-width: 768px) {
+    .window-outer {
+      width: calc(100vw - 2rem);
+    }
+    .window {
+      width: 100%;
+    }
+    .screen {
+      width: 100%;
+      height: min(var(--h), 42svh);
+    }
+    /* Drop the desktop-scale trick — render the iframe at natural mobile width */
+    .iframe-scaler {
+      width: 100%;
+      height: min(var(--h), 42svh);
+      transform: none;
+    }
+  }
+
   .window.loaded .screen-overlay { opacity: 0; pointer-events: none; }
   .window.loaded iframe { animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
   @keyframes fade-up {
@@ -230,6 +250,36 @@ const noteBg = noteColors[noteColor] ?? noteColors.yellow;
 </style>
 
 <script>
+  // Recompute --scale and --frame-h so the iframe fills the actual rendered width.
+  const DESKTOP_W = 1440;
+  const mobileQuery = window.matchMedia('(max-width: 768px)');
+
+  function fitWindow(win: HTMLElement) {
+    // On mobile, CSS drops the scaling transform entirely — nothing to compute.
+    if (mobileQuery.matches) return;
+    const outer = win.closest<HTMLElement>('.window-outer');
+    if (!outer) return;
+    const availW = outer.getBoundingClientRect().width;
+    if (availW <= 0) return;
+    const designH = parseFloat(win.dataset.designH ?? '600');
+    const scale = availW / DESKTOP_W;
+    win.style.setProperty('--scale', String(scale));
+    win.style.setProperty('--frame-h', `${Math.round(designH / scale)}px`);
+  }
+
+  const ro = new ResizeObserver(entries => {
+    for (const entry of entries) {
+      const win = (entry.target as HTMLElement).querySelector<HTMLElement>('.window');
+      if (win) fitWindow(win);
+    }
+  });
+
+  for (const win of document.querySelectorAll<HTMLElement>('.window[data-design-h]')) {
+    fitWindow(win);
+    const outer = win.closest<HTMLElement>('.window-outer');
+    if (outer) ro.observe(outer);
+  }
+
   for (const outer of document.querySelectorAll<HTMLElement>('.window-outer')) {
     // Inside a carousel the track handles drag-scroll; don't let the bar steal pointer capture
     if (outer.closest('.carousel-track')) continue;
