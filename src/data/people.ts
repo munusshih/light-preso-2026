@@ -1,0 +1,22 @@
+export const people: Record<string, string> = {
+  // verified
+  "Nikki Makagiansar": "https://niktari.com",
+  "Patt Vira": "https://www.pattvira.com",
+  "Tee Topor": "https://teetopor.art",
+  "Gaia Hwang": "http://namedgaia.com",
+  "Yashasyaa Arya": "https://yashasyaa.com",
+  "Anoushka Bhalla": "https://www.anoushkabhalla.com",
+  "Alexandria Deters": "https://www.alexandriadeters.com",
+  "Mark Fisher": "https://en.wikipedia.org/wiki/Mark_Fisher",
+  "Franco Chen": "https://www.hellofranco.us/",
+  "Em DeVincentis": "https://deathrattle.org/vol-7-blog/devincentis",
+  "Marily Papanastasatou": "https://www.linkedin.com/in/marily-papanastasatou-98689623b/",
+  "Ananya Soogoor": "https://ananyam8gic.com/",
+  "Tzuyun Wei": "https://www.behance.net/tzutzu",
+  "Ihao Liao": "https://www.behance.net/onemoooooor",
+  "Chun-Huang Lin": "https://linchunhuang.com/",
+  "Nora Wang": "https://www.instagram.com/whxcu/",
+  "Nora (Huixin) Wang": "https://www.instagram.com/whxcu/",
+  "Jenelle Zhao": "https://www.linkedin.com/in/jenny-zhao-a97069a8/",
+  "Jenelle (Wenjing) Zhao": "https://www.linkedin.com/in/jenny-zhao-a97069a8/",
+};

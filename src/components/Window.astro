@@ -1,4 +1,6 @@
 ---
+import { people } from '../data/people';
+
 interface Props {
   src: string;
   size?: 'medium' | 'large';
@@ -9,6 +11,18 @@ interface Props {
   type?: 'auto' | 'iframe' | 'image' | 'video';
 }
 const { src, size = 'medium', title = '', note, noteColor = 'yellow', type = 'auto' } = Astro.props;
+
+// Replace known person names in note with HTML links
+function linkifyPeople(text: string): string {
+  let result = text;
+  // Sort by length descending so longer names (with parentheticals) match first
+  const sorted = Object.entries(people).sort((a, b) => b[0].length - a[0].length);
+  for (const [name, url] of sorted) {
+    result = result.replaceAll(name, `<a href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`);
+  }
+  return result;
+}
+const linkedNote = note ? linkifyPeople(note) : undefined;
 const positions = ['top-right', 'top-left', 'bottom-right', 'bottom-left'] as const;
 const notePosition = Astro.props.notePosition ?? positions[Math.floor(Math.random() * positions.length)];
 
@@ -41,9 +55,9 @@ const noteBg = noteColors[noteColor] ?? noteColors.yellow;
 ---
 
 <div class="window-outer">
-  {note && (
-    <div class={`sticky-note note-${notePosition}`} style={`background:${noteBg}`}>
-      {note}
+  {linkedNote && (
+    <div class={`sticky-note note-${notePosition}`} style={`background:${noteBg}`} data-note>
+      <span set:html={linkedNote} />
     </div>
   )}
   <div
@@ -119,6 +133,13 @@ const noteBg = noteColors[noteColor] ?? noteColors.yellow;
     white-space: pre-line;
     pointer-events: none;
     box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+  }
+
+  .sticky-note a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    pointer-events: all;
   }
 
   .note-top-right    { top: -14px;    right: 1.25rem; transform: rotate( 2deg); }
@@ -250,6 +271,14 @@ const noteBg = noteColors[noteColor] ?? noteColors.yellow;
 </style>
 
 <script>
+  // Shrink sticky-note font when text is long
+  for (const note of document.querySelectorAll<HTMLElement>('[data-note]')) {
+    const len = note.textContent?.trim().length ?? 0;
+    if (len > 160) note.style.fontSize = '0.72rem';
+    else if (len > 100) note.style.fontSize = '0.82rem';
+    else if (len > 60) note.style.fontSize = '0.92rem';
+  }
+
   // Recompute --scale and --frame-h so the iframe fills the actual rendered width.
   const DESKTOP_W = 1440;
   const mobileQuery = window.matchMedia('(max-width: 768px)');

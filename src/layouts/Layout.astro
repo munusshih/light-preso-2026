@@ -15,10 +15,6 @@ const { frontmatter } = Astro.props;
     />
   </head>
   <body>
-    <nav class="section-nav" aria-label="Sections">
-      <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
-      <div class="nav-list"></div>
-    </nav>
     <slot />
     <script>
       // ── Progressive iframe loading ────────────────────────────────────────
@@ -87,67 +83,6 @@ const { frontmatter } = Astro.props;
         updateListFocus();
       }
 
-      // ── Section nav ───────────────────────────────────────────────────────
-      const nav = document.querySelector<HTMLElement>(".section-nav");
-      const list = nav?.querySelector<HTMLElement>(".nav-list");
-      const toggle = nav?.querySelector<HTMLButtonElement>(".nav-toggle");
-
-      // Only track sections that have a named eyebrow label
-      const sections = [
-        ...document.querySelectorAll<HTMLElement>(".preso-section"),
-      ].filter((el) => el.dataset.navLabel);
-
-      if (nav && list && sections.length) {
-        sections.forEach((el, i) => {
-          if (!el.id) el.id = `s-${i}`;
-
-          const label = el.dataset.navLabel || String(i + 1);
-
-          const a = document.createElement("a");
-          a.href = `#${el.id}`;
-          a.title = label;
-
-          const dot = document.createElement("span");
-          dot.className = "nav-dot";
-          dot.textContent = String(i + 1);
-
-          const labelEl = document.createElement("span");
-          labelEl.className = "nav-label";
-          labelEl.textContent = label;
-
-          a.addEventListener("click", (e) => {
-            e.preventDefault();
-            el.scrollIntoView({ behavior: "smooth" });
-            // close hamburger menu on mobile
-            list.classList.remove("open");
-            if (toggle) toggle.textContent = "☰";
-          });
-
-          a.append(dot, labelEl);
-          list.appendChild(a);
-        });
-
-        const links = [...list.querySelectorAll<HTMLAnchorElement>("a")];
-
-        toggle?.addEventListener("click", () => {
-          const isOpen = list.classList.toggle("open");
-          toggle.textContent = isOpen ? "✕" : "☰";
-        });
-
-        function updateNav() {
-          const mid = window.scrollY + window.innerHeight * 0.5;
-          let cur = sections[0];
-          for (const s of sections) {
-            if (s.getBoundingClientRect().top + window.scrollY <= mid) cur = s;
-          }
-          links.forEach((a) =>
-            a.classList.toggle("active", a.hash === `#${cur.id}`),
-          );
-        }
-
-        window.addEventListener("scroll", updateNav, { passive: true });
-        updateNav();
-      }
     </script>
   </body>
 </html>
