@@ -126,9 +126,10 @@ const noteBg = noteColors[noteColor] ?? noteColors.yellow;
     z-index: 10;
     padding: 0.6rem 0.9rem;
     font-family: 'Be Vietnam Pro', system-ui, sans-serif;
-    font-size: clamp(0.85rem, 1.4vw, 1.1rem);
+    font-size: 0.82rem;
     font-weight: 600;
-    line-height: 1.4;
+    letter-spacing: 0;
+    line-height: 1.45;
     max-width: 15rem;
     white-space: pre-line;
     pointer-events: none;
@@ -271,14 +272,6 @@ const noteBg = noteColors[noteColor] ?? noteColors.yellow;
 </style>
 
 <script>
-  // Shrink sticky-note font when text is long
-  for (const note of document.querySelectorAll<HTMLElement>('[data-note]')) {
-    const len = note.textContent?.trim().length ?? 0;
-    if (len > 160) note.style.fontSize = '0.72rem';
-    else if (len > 100) note.style.fontSize = '0.82rem';
-    else if (len > 60) note.style.fontSize = '0.92rem';
-  }
-
   // Recompute --scale and --frame-h so the iframe fills the actual rendered width.
   const DESKTOP_W = 1440;
   const mobileQuery = window.matchMedia('(max-width: 768px)');
