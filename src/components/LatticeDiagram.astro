@@ -1,0 +1,141 @@
+---
+/**
+ * Hasse diagram (lattice). Each node sits at a numeric level — higher level
+ * = nearer the top. Edges connect nodes only where one is covered by the
+ * other (no transitive edges). Reads like a set-theoretic diagram from
+ * a math text.
+ */
+interface LatticeNode {
+  id: string;
+  label: string;
+  /** integer rank: higher = higher on page */
+  level: number;
+}
+interface LatticeEdge {
+  from: string;
+  to: string;
+  /** optional label printed beside the edge */
+  label?: string;
+}
+interface Props {
+  nodes: LatticeNode[];
+  edges: LatticeEdge[];
+  caption?: string;
+}
+const { nodes, edges, caption } = Astro.props;
+
+// Group by level, compute x position evenly within each level
+const byLevel = new Map<number, LatticeNode[]>();
+nodes.forEach((n) => {
+  if (!byLevel.has(n.level)) byLevel.set(n.level, []);
+  byLevel.get(n.level)!.push(n);
+});
+const minL = Math.min(...nodes.map((n) => n.level));
+const maxL = Math.max(...nodes.map((n) => n.level));
+
+const placed: Record<string, { x: number; y: number }> = {};
+const W = 100;
+const H = 100;
+byLevel.forEach((levelNodes, level) => {
+  const yNorm = maxL === minL ? 0.5 : 1 - (level - minL) / (maxL - minL);
+  const y = yNorm * H;
+  levelNodes.forEach((n, i) => {
+    const xNorm = (i + 1) / (levelNodes.length + 1);
+    placed[n.id] = { x: xNorm * W, y };
+  });
+});
+---
+
+<figure class="diagram-figure lattice-figure">
+  <div class="lattice-canvas">
+    <svg
+      class="lattice-svg"
+      viewBox={`0 0 ${W} ${H}`}
+      preserveAspectRatio="xMidYMid meet"
+      aria-hidden="false"
+    >
+      {edges.map((e) => {
+        const a = placed[e.from];
+        const b = placed[e.to];
+        if (!a || !b) return null;
+        const mx = (a.x + b.x) / 2;
+        const my = (a.y + b.y) / 2;
+        return (
+          <g>
+            <line
+              x1={a.x}
+              y1={a.y}
+              x2={b.x}
+              y2={b.y}
+              stroke="currentColor"
+              stroke-width="0.4"
+              opacity="0.85"
+            />
+            {e.label && (
+              <text
+                x={mx}
+                y={my}
+                fill="currentColor"
+                font-family="Source Serif 4, serif"
+                font-style="italic"
+                font-size="2.2"
+                text-anchor="middle"
+                dominant-baseline="middle"
+                opacity="0.65"
+              >
+                <tspan dx="0.6" dy="0">{e.label}</tspan>
+              </text>
+            )}
+          </g>
+        );
+      })}
+      {nodes.map((n) => {
+        const p = placed[n.id];
+        if (!p) return null;
+        const textWidth = Math.min(28, Math.max(8, n.label.length * 1.5));
+        return (
+          <g>
+            <rect
+              x={p.x - textWidth / 2}
+              y={p.y - 2.2}
+              width={textWidth}
+              height={4.4}
+              fill="var(--paper, #fbfaf5)"
+              stroke="none"
+            />
+            <text
+              x={p.x}
+              y={p.y}
+              fill="currentColor"
+              font-family="Source Serif 4, serif"
+              font-style="italic"
+              font-size="3"
+              text-anchor="middle"
+              dominant-baseline="central"
+            >{n.label}</text>
+            <circle cx={p.x} cy={p.y - 3.2} r="0.8" fill="currentColor" opacity="0.6"/>
+            <circle cx={p.x} cy={p.y + 3.2} r="0.8" fill="currentColor" opacity="0.6"/>
+          </g>
+        );
+      })}
+    </svg>
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .lattice-canvas {
+    color: var(--ink, #000);
+    padding: 1.5rem 1rem;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lattice-svg {
+    width: 100%;
+    height: 100%;
+    max-height: 32rem;
+  }
+</style>

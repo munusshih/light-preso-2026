@@ -1,0 +1,184 @@
+---
+interface Circle {
+  label: string;
+}
+interface Intersection {
+  idx: number[]; // indices of the circles whose intersection this labels
+  label: string;
+}
+interface Props {
+  circles: Circle[]; // typically 3
+  intersections?: Intersection[];
+  caption?: string;
+  border?: boolean;
+}
+const { circles, intersections = [], caption, border = false } = Astro.props;
+const uid = `venn-${Math.random().toString(36).slice(2, 9)}`;
+const payload = JSON.stringify({ circles, intersections });
+---
+
+<figure class="diagram-figure venn-figure">
+  <div
+    class={`diagram-canvas venn-canvas${border ? " bordered" : ""}`}
+    id={uid}
+    data-venn={payload}
+  ></div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<script>
+  import { loadP5, FONT_STACK, readThemeColors, readBodyFontPx } from "../lib/p5-loader";
+
+  type Circle = { label: string };
+  type Intersection = { idx: number[]; label: string };
+
+  function initVenn(container: HTMLElement) {
+    if (container.dataset.ready === "1") return;
+    container.dataset.ready = "1";
+
+    const { circles, intersections } = JSON.parse(
+      container.dataset.venn ?? "{}"
+    ) as { circles: Circle[]; intersections: Intersection[] };
+
+    new (window as any).p5((p: any) => {
+      let W = 0;
+      let H = 0;
+      let ctx: CanvasRenderingContext2D;
+      let theme = { paper: "#fbfaf5", ink: "#000000" };
+      let bodyPx = 16;
+
+      function refreshTheme() {
+        theme = readThemeColors(container);
+        bodyPx = readBodyFontPx(container);
+      }
+
+      function uiScale() {
+        return Math.max(1, Math.min(W, H) / 420);
+      }
+
+      function setFont(size: number, italic = true) {
+        ctx.font = `${italic ? "italic " : ""}${size}px ${FONT_STACK}`;
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
+      }
+
+      p.setup = () => {
+        W = container.clientWidth;
+        H = container.clientHeight;
+        const canvas = p.createCanvas(W, H);
+        canvas.parent(container);
+        ctx = p.drawingContext as CanvasRenderingContext2D;
+        refreshTheme();
+        matchMedia("(prefers-color-scheme: dark)").addEventListener(
+          "change",
+          refreshTheme
+        );
+      };
+
+      p.windowResized = () => {
+        const nw = container.clientWidth;
+        const nh = container.clientHeight;
+        if (nw === W && nh === H) return;
+        p.resizeCanvas(nw, nh);
+        W = nw;
+        H = nh;
+        refreshTheme();
+      };
+
+      function offsetsFor(n: number, r: number): [number, number][] {
+        // Distribute circle centers around a small inner radius so they
+        // overlap pleasingly regardless of count.
+        if (n === 2) {
+          return [
+            [-r * 0.42, 0],
+            [r * 0.42, 0],
+          ];
+        }
+        if (n === 3) {
+          return [
+            [-r * 0.42, -r * 0.22],
+            [r * 0.42, -r * 0.22],
+            [0, r * 0.4],
+          ];
+        }
+        // generic distribution
+        const out: [number, number][] = [];
+        for (let i = 0; i < n; i++) {
+          const a = (i / n) * Math.PI * 2 - Math.PI / 2;
+          out.push([Math.cos(a) * r * 0.45, Math.sin(a) * r * 0.45]);
+        }
+        return out;
+      }
+
+      function labelAnchorFor(i: number, n: number, x: number, y: number, r: number) {
+        // push label outward from the cluster center
+        const cx = W / 2;
+        const cy = H / 2;
+        const dx = x - cx;
+        const dy = y - cy;
+        const len = Math.hypot(dx, dy) || 1;
+        const nx = dx / len;
+        const ny = dy / len;
+        return { lx: x + nx * (r * 1.05), ly: y + ny * (r * 1.05) };
+      }
+
+      p.draw = () => {
+        p.clear();
+        const t = p.millis() / 1000;
+        const s = uiScale();
+
+        const cx = W / 2;
+        const cy = H / 2;
+        const r0 = Math.min(W, H) * 0.31;
+        const n = circles.length;
+        const offs = offsetsFor(n, r0);
+
+        const centers: { x: number; y: number; r: number }[] = [];
+
+        // draw circles
+        circles.forEach((c, i) => {
+          const breath = 1 + Math.sin(t * 0.3 + i * 1.7) * 0.025;
+          const x = cx + offs[i][0];
+          const y = cy + offs[i][1];
+          const r = r0 * breath;
+          centers.push({ x, y, r });
+
+          p.noFill();
+          p.stroke(theme.ink);
+          p.strokeWeight(1.05 * s);
+          p.ellipse(x, y, r * 2);
+        });
+
+        // circle labels
+        circles.forEach((c, i) => {
+          const { x, y, r } = centers[i];
+          const { lx, ly } = labelAnchorFor(i, n, x, y, r);
+          setFont(bodyPx, true);
+          ctx.fillStyle = theme.ink;
+          ctx.fillText(c.label, lx, ly);
+        });
+
+        // intersection labels — italic
+        intersections.forEach((itr) => {
+          let x = 0;
+          let y = 0;
+          itr.idx.forEach((i) => {
+            x += centers[i].x;
+            y += centers[i].y;
+          });
+          x /= itr.idx.length;
+          y /= itr.idx.length;
+          setFont(bodyPx, true);
+          ctx.fillStyle = theme.ink;
+          ctx.fillText(itr.label, x, y);
+        });
+      };
+    });
+  }
+
+  loadP5().then(() => {
+    document
+      .querySelectorAll<HTMLElement>(".venn-canvas")
+      .forEach((el) => initVenn(el));
+  });
+</script>

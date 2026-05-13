@@ -1,0 +1,182 @@
+---
+/**
+ * Stratigraphic column. Reads bottom-up like a geological core sample:
+ * deepest (oldest) at the bottom, surface (most recent) at the top. Each
+ * layer has a hatching pattern indicating its "type" plus a label and
+ * year range.
+ *
+ * Patterns: dots · diagonal · cross · solid · dashes · waves
+ */
+interface Stratum {
+  label: string;
+  /** range or single year/period */
+  period?: string;
+  /** rough thickness 1..3 (relative) */
+  weight?: number;
+  /** hatching pattern */
+  pattern?: "dots" | "diag" | "cross" | "solid" | "dashes" | "waves";
+}
+interface Props {
+  /** ORDERED top → bottom (most recent → oldest). Will be reversed visually. */
+  strata: Stratum[];
+  caption?: string;
+}
+const { strata, caption } = Astro.props;
+const orderedStrata = [...strata].reverse(); // visually bottom-up
+---
+
+<figure class="diagram-figure stratum-figure">
+  <div class="stratum-canvas">
+    <div class="stratum-axis">
+      <span class="axis-cap">surface</span>
+      <span class="axis-line"></span>
+      <span class="axis-cap">depth</span>
+    </div>
+    <ol class="stratum-stack">
+      {strata.map((s) => (
+        <li
+          class={`stratum stratum-${s.pattern ?? "diag"}`}
+          style={`--weight:${s.weight ?? 1}`}
+        >
+          <span class="stratum-fill" aria-hidden="true"></span>
+          <span class="stratum-label">
+            {s.period && <span class="stratum-period">{s.period}</span>}
+            <span class="stratum-name">{s.label}</span>
+          </span>
+        </li>
+      ))}
+    </ol>
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .stratum-canvas {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    padding: 1rem 0.5rem;
+    align-items: stretch;
+  }
+  .stratum-axis {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--ink, #000);
+    font-family: "Source Serif 4", "Times New Roman", Times, serif;
+    font-style: italic;
+    font-size: 0.78em;
+    opacity: 0.65;
+  }
+  .stratum-axis .axis-line {
+    flex: 1;
+    width: 1px;
+    background: var(--ink, #000);
+    opacity: 0.45;
+    margin: 0.4rem 0;
+  }
+  .stratum-axis .axis-cap { writing-mode: horizontal-tb; }
+
+  .stratum-stack {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--ink, #000);
+    counter-reset: none;
+    font-size: inherit;
+    line-height: inherit;
+  }
+  .stratum-stack > .stratum {
+    counter-increment: none;
+    grid-template-columns: none !important;
+  }
+  .stratum-stack > .stratum::before { content: none !important; }
+  .stratum {
+    position: relative;
+    border-bottom: 1px solid var(--ink, #000) !important;
+    border-top: none !important;
+    min-height: calc(2.6rem * var(--weight, 1));
+    display: flex !important;
+    align-items: center;
+    overflow: hidden;
+    padding: 0.6rem 1rem !important;
+    color: var(--ink, #000);
+    font-family: "Source Serif 4", "Times New Roman", Times, serif;
+  }
+  .stratum-stack > .stratum:first-child { border-top: none !important; }
+  .stratum-stack > .stratum:last-child { border-bottom: none !important; }
+
+  .stratum-fill {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.35;
+  }
+  .stratum-label {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    background:
+      linear-gradient(
+        to right,
+        color-mix(in srgb, var(--paper, #fff) 88%, transparent) 0%,
+        color-mix(in srgb, var(--paper, #fff) 88%, transparent) 65%,
+        transparent 100%
+      );
+    padding: 0.15em 0.5em 0.15em 0;
+  }
+  .stratum-period {
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.72em;
+    letter-spacing: 0.06em;
+    opacity: 0.6;
+    border: 1px solid var(--ink, #000);
+    padding: 0.05em 0.4em;
+    line-height: 1;
+  }
+  .stratum-name {
+    font-style: italic;
+    font-size: 0.98em;
+    line-height: 1.3;
+  }
+
+  /* hatching patterns — all drawn with currentColor so dark mode swap works */
+  .stratum-dots .stratum-fill {
+    background-image: radial-gradient(currentColor 0.8px, transparent 1px);
+    background-size: 8px 8px;
+  }
+  .stratum-diag .stratum-fill {
+    background-image: repeating-linear-gradient(
+      45deg,
+      currentColor 0 1px,
+      transparent 1px 7px
+    );
+  }
+  .stratum-cross .stratum-fill {
+    background-image:
+      repeating-linear-gradient(45deg, currentColor 0 1px, transparent 1px 9px),
+      repeating-linear-gradient(-45deg, currentColor 0 1px, transparent 1px 9px);
+  }
+  .stratum-solid .stratum-fill { background: currentColor; opacity: 0.18; }
+  .stratum-dashes .stratum-fill {
+    background-image: repeating-linear-gradient(
+      to right,
+      currentColor 0 6px,
+      transparent 6px 14px
+    );
+    background-size: 100% 4px;
+    background-repeat: repeat-y;
+    background-position: center;
+  }
+  .stratum-waves .stratum-fill {
+    background-image: repeating-radial-gradient(
+      circle at 50% 100%,
+      currentColor 0 1px,
+      transparent 1px 8px
+    );
+  }
+</style>

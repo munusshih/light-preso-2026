@@ -1,0 +1,135 @@
+---
+interface Event {
+  year: string;
+  label: string;
+}
+interface Props {
+  events: Event[];
+  caption?: string;
+  border?: boolean;
+}
+const { events, caption, border = false } = Astro.props;
+const uid = `timeline-${Math.random().toString(36).slice(2, 9)}`;
+const payload = JSON.stringify({ events });
+---
+
+<figure class="diagram-figure timeline-figure">
+  <div
+    class={`diagram-canvas timeline-canvas${border ? " bordered" : ""}`}
+    id={uid}
+    data-timeline={payload}
+  ></div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<script>
+  import { loadP5, FONT_STACK, readThemeColors, readBodyFontPx } from "../lib/p5-loader";
+
+  type Event = { year: string; label: string };
+
+  function initTimeline(container: HTMLElement) {
+    if (container.dataset.ready === "1") return;
+    container.dataset.ready = "1";
+
+    const { events } = JSON.parse(container.dataset.timeline ?? "{}") as {
+      events: Event[];
+    };
+
+    new (window as any).p5((p: any) => {
+      let W = 0;
+      let H = 0;
+      let ctx: CanvasRenderingContext2D;
+      let theme = { paper: "#fbfaf5", ink: "#000000" };
+      let bodyPx = 16;
+
+      function refreshTheme() {
+        theme = readThemeColors(container);
+        bodyPx = readBodyFontPx(container);
+      }
+
+      function uiScale() {
+        return Math.max(1, Math.min(W, H) / 420);
+      }
+
+      function setFont(size: number, italic = true, align: "center" | "left" | "right" = "center") {
+        ctx.font = `${italic ? "italic " : ""}${size}px ${FONT_STACK}`;
+        ctx.textBaseline = "middle";
+        ctx.textAlign = align;
+      }
+
+      p.setup = () => {
+        W = container.clientWidth;
+        H = container.clientHeight;
+        const canvas = p.createCanvas(W, H);
+        canvas.parent(container);
+        ctx = p.drawingContext as CanvasRenderingContext2D;
+        refreshTheme();
+        matchMedia("(prefers-color-scheme: dark)").addEventListener(
+          "change",
+          refreshTheme
+        );
+      };
+
+      p.windowResized = () => {
+        const nw = container.clientWidth;
+        const nh = container.clientHeight;
+        if (nw === W && nh === H) return;
+        p.resizeCanvas(nw, nh);
+        W = nw;
+        H = nh;
+        refreshTheme();
+      };
+
+      p.draw = () => {
+        p.clear();
+        const t = p.millis() / 1000;
+        const s = uiScale();
+
+        const padX = 70 * s;
+        const y0 = H * 0.5;
+
+        // axis line
+        p.stroke(theme.ink);
+        p.strokeWeight(0.95 * s);
+        p.line(padX, y0, W - padX, y0);
+
+        const n = events.length;
+        events.forEach((e, i) => {
+          const x =
+            n === 1 ? W / 2 : padX + (i / (n - 1)) * (W - padX * 2);
+
+          // tick
+          p.stroke(theme.ink);
+          p.strokeWeight(0.95 * s);
+          p.line(x, y0 - 7 * s, x, y0 + 7 * s);
+
+          // year (always below)
+          setFont(bodyPx, true);
+          ctx.fillStyle = theme.ink;
+          ctx.fillText(e.year, x, y0 + bodyPx * 1.7);
+
+          // event label alternates above/below
+          const above = i % 2 === 0;
+          const baseY = above ? y0 - bodyPx * 4.5 : y0 + bodyPx * 4.5;
+          const bob = Math.sin(t * 0.35 + i * 0.6) * 5 * s;
+          const labelY = baseY + bob;
+
+          // hairline from tick to label
+          p.stroke(theme.ink);
+          p.strokeWeight(0.7 * s);
+          p.line(x, above ? y0 - 7 * s : y0 + 7 * s, x, labelY + (above ? bodyPx * 0.7 : -bodyPx * 0.7));
+
+          setFont(bodyPx, true);
+          ctx.fillStyle = theme.ink;
+          ctx.fillText(e.label, x, labelY);
+        });
+      };
+    });
+  }
+
+  loadP5().then(() => {
+    document
+      .querySelectorAll<HTMLElement>(".timeline-canvas")
+      .forEach((el) => initTimeline(el));
+  });
+</script>

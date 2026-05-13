@@ -1,0 +1,138 @@
+---
+interface Ring {
+  items: string[];
+}
+interface Props {
+  center: string;
+  rings: Ring[];
+  caption?: string;
+  border?: boolean;
+}
+const { center, rings, caption, border = false } = Astro.props;
+const uid = `orbit-${Math.random().toString(36).slice(2, 9)}`;
+const payload = JSON.stringify({ center, rings });
+---
+
+<figure class="diagram-figure orbit-figure">
+  <div
+    class={`diagram-canvas orbit-canvas${border ? " bordered" : ""}`}
+    id={uid}
+    data-orbit={payload}
+  ></div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<script>
+  import { loadP5, FONT_STACK, readThemeColors, readBodyFontPx } from "../lib/p5-loader";
+
+  type Ring = { items: string[] };
+  type OrbitData = { center: string; rings: Ring[] };
+
+  function initOrbit(container: HTMLElement) {
+    if (container.dataset.ready === "1") return;
+    container.dataset.ready = "1";
+
+    const data = JSON.parse(container.dataset.orbit ?? "{}") as OrbitData;
+
+    new (window as any).p5((p: any) => {
+      let W = 0;
+      let H = 0;
+      let ctx: CanvasRenderingContext2D;
+      let theme = { paper: "#fbfaf5", ink: "#000000" };
+      let bodyPx = 16;
+
+      function refreshTheme() {
+        theme = readThemeColors(container);
+        bodyPx = readBodyFontPx(container);
+      }
+
+      function uiScale() {
+        return Math.max(1, Math.min(W, H) / 420);
+      }
+
+      function setFont(size: number, italic = true) {
+        ctx.font = `${italic ? "italic " : ""}${size}px ${FONT_STACK}`;
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
+      }
+
+      p.setup = () => {
+        W = container.clientWidth;
+        H = container.clientHeight;
+        const canvas = p.createCanvas(W, H);
+        canvas.parent(container);
+        ctx = p.drawingContext as CanvasRenderingContext2D;
+        refreshTheme();
+        matchMedia("(prefers-color-scheme: dark)").addEventListener(
+          "change",
+          refreshTheme
+        );
+      };
+
+      p.windowResized = () => {
+        const nw = container.clientWidth;
+        const nh = container.clientHeight;
+        if (nw === W && nh === H) return;
+        p.resizeCanvas(nw, nh);
+        W = nw;
+        H = nh;
+        refreshTheme();
+      };
+
+      p.draw = () => {
+        p.clear();
+        const t = p.millis() / 1000;
+        const s = uiScale();
+        const cx = W / 2;
+        const cy = H / 2;
+        const maxR = Math.min(W, H) * 0.45;
+        const ringCount = data.rings.length;
+        const baseR = maxR * 0.3;
+        const spacing = (maxR - baseR) / Math.max(1, ringCount);
+
+        // rings (back to front)
+        data.rings.forEach((ring, i) => {
+          const r = baseR + spacing * (i + 1);
+          const rot = t * (0.03 + i * 0.012) * (i % 2 === 0 ? 1 : -1);
+
+          // hairline ring
+          p.noFill();
+          p.stroke(theme.ink);
+          p.strokeWeight(0.7 * s);
+          p.ellipse(cx, cy, r * 2);
+
+          // items
+          ring.items.forEach((label, j) => {
+            const a = (j / ring.items.length) * Math.PI * 2 + rot;
+            const x = cx + Math.cos(a) * r;
+            const y = cy + Math.sin(a) * r;
+
+            // tiny tick on ring
+            p.fill(theme.ink);
+            p.noStroke();
+            p.ellipse(x, y, 4.2 * s);
+
+            // label, offset slightly outward
+            const labelR = r + bodyPx * 1.1;
+            const lx = cx + Math.cos(a) * labelR;
+            const ly = cy + Math.sin(a) * labelR;
+            setFont(bodyPx, true);
+            ctx.fillStyle = theme.ink;
+            ctx.fillText(label, lx, ly);
+          });
+        });
+
+        // center label
+        setFont(bodyPx, true);
+        ctx.fillStyle = theme.ink;
+        ctx.fillText(data.center, cx, cy);
+      };
+    });
+  }
+
+  loadP5().then(() => {
+    document
+      .querySelectorAll<HTMLElement>(".orbit-canvas")
+      .forEach((el) => initOrbit(el));
+  });
+</script>

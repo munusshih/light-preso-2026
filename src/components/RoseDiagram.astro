@@ -1,0 +1,156 @@
+---
+/**
+ * Coxcomb / rose diagram (after Florence Nightingale). Equal-width angular
+ * sectors radiating from a center, each with a radius proportional to the
+ * datum's value. Patterns differentiate sectors in B&W.
+ */
+interface Petal {
+  label: string;
+  /** numeric value — controls petal radius */
+  value: number;
+  pattern?: "solid" | "diag" | "dots" | "cross" | "open";
+}
+interface Props {
+  petals: Petal[];
+  /** optional center label */
+  centerLabel?: string;
+  caption?: string;
+}
+const { petals, centerLabel, caption } = Astro.props;
+
+const n = petals.length;
+const max = Math.max(...petals.map((p) => p.value), 1);
+const W = 200;
+const H = 200;
+const cx = W / 2;
+const cy = H / 2;
+const maxR = Math.min(W, H) * 0.45;
+
+const sectorArc = (i: number, value: number) => {
+  const a0 = (i / n) * Math.PI * 2 - Math.PI / 2;
+  const a1 = ((i + 1) / n) * Math.PI * 2 - Math.PI / 2;
+  const r = (value / max) * maxR;
+  const x0 = cx + Math.cos(a0) * r;
+  const y0 = cy + Math.sin(a0) * r;
+  const x1 = cx + Math.cos(a1) * r;
+  const y1 = cy + Math.sin(a1) * r;
+  return `M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 0 1 ${x1} ${y1} Z`;
+};
+const labelPos = (i: number) => {
+  const a = ((i + 0.5) / n) * Math.PI * 2 - Math.PI / 2;
+  const r = maxR + 12;
+  return { x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r, a };
+};
+const patternFor = (p: Petal["pattern"]) => {
+  switch (p) {
+    case "solid": return "url(#rose-solid)";
+    case "dots": return "url(#rose-dots)";
+    case "cross": return "url(#rose-cross)";
+    case "open": return "none";
+    default: return "url(#rose-diag)";
+  }
+};
+---
+
+<figure class="diagram-figure rose-figure">
+  <div class="rose-canvas">
+    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="false">
+      <defs>
+        <pattern id="rose-diag" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="4" stroke="currentColor" stroke-width="0.5" opacity="0.55"/>
+        </pattern>
+        <pattern id="rose-cross" patternUnits="userSpaceOnUse" width="4" height="4">
+          <line x1="0" y1="0" x2="4" y2="4" stroke="currentColor" stroke-width="0.3" opacity="0.55"/>
+          <line x1="4" y1="0" x2="0" y2="4" stroke="currentColor" stroke-width="0.3" opacity="0.55"/>
+        </pattern>
+        <pattern id="rose-dots" patternUnits="userSpaceOnUse" width="4" height="4">
+          <circle cx="2" cy="2" r="0.5" fill="currentColor" opacity="0.6"/>
+        </pattern>
+        <pattern id="rose-solid" patternUnits="userSpaceOnUse" width="2" height="2">
+          <rect width="2" height="2" fill="currentColor" opacity="0.25"/>
+        </pattern>
+      </defs>
+
+      {/* concentric reference rings */}
+      {[0.25, 0.5, 0.75, 1].map((r) => (
+        <circle
+          cx={cx}
+          cy={cy}
+          r={maxR * r}
+          fill="none"
+          stroke="currentColor"
+          stroke-width="0.3"
+          stroke-dasharray="0.6 1.2"
+          opacity="0.35"
+        />
+      ))}
+
+      {petals.map((p, i) => (
+        <path
+          d={sectorArc(i, p.value)}
+          fill={patternFor(p.pattern)}
+          stroke="currentColor"
+          stroke-width="0.6"
+        />
+      ))}
+
+      {petals.map((p, i) => {
+        const pos = labelPos(i);
+        const anchor =
+          Math.cos(pos.a) > 0.2
+            ? "start"
+            : Math.cos(pos.a) < -0.2
+            ? "end"
+            : "middle";
+        return (
+          <text
+            x={pos.x}
+            y={pos.y}
+            fill="currentColor"
+            font-family="Source Serif 4, serif"
+            font-style="italic"
+            font-size="4.2"
+            text-anchor={anchor}
+            dominant-baseline="middle"
+          >{p.label}</text>
+        );
+      })}
+
+      {centerLabel && (
+        <>
+          <circle cx={cx} cy={cy} r="9" fill="var(--paper, #fff)" stroke="currentColor" stroke-width="0.5"/>
+          <text
+            x={cx}
+            y={cy}
+            fill="currentColor"
+            font-family="Source Serif 4, serif"
+            font-style="italic"
+            font-size="3.8"
+            text-anchor="middle"
+            dominant-baseline="middle"
+          >{centerLabel}</text>
+        </>
+      )}
+    </svg>
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .rose-canvas {
+    color: var(--ink, #000);
+    padding: 1rem;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 36rem;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .rose-canvas svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+</style>

@@ -1,0 +1,85 @@
+---
+import '../styles/global.css';
+import '../styles/classes.css';
+const { frontmatter } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{frontmatter.title ?? "Class Sites"}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,400&family=Source+Code+Pro:wght@400;500;600&family=Caveat:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+    <script>
+      const iframeObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            const iframe = entry.target as HTMLIFrameElement;
+            const win = iframe.closest<HTMLElement>(".window, .p5-window");
+            if (entry.isIntersecting) {
+              if (iframe.dataset.src && !iframe.getAttribute("src")) {
+                iframe.src = iframe.dataset.src;
+                iframe.addEventListener(
+                  "load",
+                  () => win?.classList.add("loaded"),
+                  { once: true },
+                );
+              }
+            } else {
+              if (iframe.getAttribute("src")) {
+                iframe.removeAttribute("src");
+                win?.classList.remove("loaded");
+              }
+            }
+          }
+        },
+        { rootMargin: "200px" },
+      );
+      for (const iframe of document.querySelectorAll<HTMLIFrameElement>(
+        "iframe[data-src]",
+      )) {
+        iframeObserver.observe(iframe);
+      }
+
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            entry.target.classList.add("visible");
+            revealObserver.unobserve(entry.target);
+          }
+        },
+        { rootMargin: "-40px" },
+      );
+      for (const el of document.querySelectorAll(".portrait-frame")) {
+        revealObserver.observe(el);
+      }
+
+      const listItems = [...document.querySelectorAll<HTMLElement>(
+        "ul > li:not([data-nav-label='references'] ul > li)"
+      )].filter(li => !li.closest('[data-nav-label="references"]') && !li.closest('.callout'));
+      if (listItems.length) {
+        function updateListFocus() {
+          const mid = window.innerHeight * 0.5;
+          for (const li of listItems) {
+            const rect = li.getBoundingClientRect();
+            const center = rect.top + rect.height / 2;
+            li.classList.toggle(
+              "li-focus",
+              Math.abs(center - mid) < window.innerHeight * 0.22,
+            );
+          }
+        }
+        window.addEventListener("scroll", updateListFocus, { passive: true });
+        updateListFocus();
+      }
+    </script>
+  </body>
+</html>

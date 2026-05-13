@@ -1,0 +1,235 @@
+---
+/**
+ * Marginalia diagram. A column of prose with hand-drawn margin notes pulled
+ * out to the side. Each note connects to a specific line of the main text
+ * via a thin curving rule. Feels like reading a scholar's annotated copy
+ * of a treatise.
+ */
+interface Annotation {
+  /** zero-based line index in the body that this note refers to */
+  line: number;
+  /** side the note appears on */
+  side?: "left" | "right";
+  text: string;
+}
+interface Props {
+  /** main text — one string per line */
+  body: string[];
+  /** the title at the top of the page */
+  title?: string;
+  /** chapter / section label */
+  section?: string;
+  annotations: Annotation[];
+  caption?: string;
+}
+const { body, title, section, annotations, caption } = Astro.props;
+// Annotations on each side, sorted by line for vertical stacking
+const left = annotations
+  .filter((a) => a.side === "left")
+  .sort((a, b) => a.line - b.line);
+const right = annotations
+  .filter((a) => a.side !== "left")
+  .sort((a, b) => a.line - b.line);
+---
+
+<figure class="diagram-figure marginalia-figure">
+  <div class="diagram-canvas marginalia-canvas">
+    <aside class="margin-col margin-left">
+      {left.map((a) => (
+        <p class="margin-note" data-line={a.line}>
+          <span class="note-arm" aria-hidden="true"></span>
+          <span class="note-text">{a.text}</span>
+        </p>
+      ))}
+    </aside>
+
+    <article class="marginalia-body">
+      {section && <p class="page-section">{section}</p>}
+      {title && <h4 class="page-title">{title}</h4>}
+      <ol class="body-lines">
+        {body.map((line, i) => (
+          <li
+            data-line-idx={i}
+            class={[
+              left.some((a) => a.line === i) ? "has-left" : "",
+              right.some((a) => a.line === i) ? "has-right" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            <span class="line-num">{String(i + 1).padStart(2, "0")}</span>
+            <span class="line-text">{line}</span>
+          </li>
+        ))}
+      </ol>
+    </article>
+
+    <aside class="margin-col margin-right">
+      {right.map((a) => (
+        <p class="margin-note" data-line={a.line}>
+          <span class="note-arm" aria-hidden="true"></span>
+          <span class="note-text">{a.text}</span>
+        </p>
+      ))}
+    </aside>
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .marginalia-canvas {
+    display: grid;
+    grid-template-columns: 0.9fr 1.4fr 0.9fr;
+    gap: 0;
+    padding: 1rem 0.25rem;
+    color: var(--ink, #000);
+    font-family: "Source Serif 4", "Times New Roman", Times, serif;
+    position: relative;
+    box-sizing: border-box;
+    min-width: 0;
+    overflow: hidden;
+    /* Override the inherited 4:3 + min-height from .diagram-canvas —
+       content-sized HTML, not a p5 surface. */
+    aspect-ratio: auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+  .margin-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 1.5rem 0.4rem;
+  }
+  .margin-left { align-items: flex-end; text-align: right; }
+  .margin-right { align-items: flex-start; text-align: left; }
+
+  .margin-note {
+    font-style: italic;
+    font-size: 0.82em;
+    line-height: 1.45;
+    max-width: 12rem;
+    width: auto !important;
+    margin: 0 !important;
+    position: relative;
+    opacity: 0.85;
+  }
+  .margin-note,
+  .margin-note .note-text,
+  .body-lines > li,
+  .body-lines > li .line-text,
+  .page-section,
+  .page-title {
+    max-width: none !important;
+  }
+  .margin-note .note-arm {
+    display: block;
+    height: 1px;
+    background: var(--ink, #000);
+    opacity: 0.5;
+    margin-bottom: 0.35em;
+    width: 2.5rem;
+  }
+  .margin-left .note-arm { margin-left: auto; }
+  .margin-right .note-arm { margin-right: auto; }
+
+  .marginalia-body {
+    border-left: 1px solid var(--ink, #000);
+    border-right: 1px solid var(--ink, #000);
+    padding: 1.5rem 1.25rem;
+    background: transparent;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .page-section {
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.7em !important;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0 0 0.3rem !important;
+    opacity: 0.55;
+    padding: 0;
+    text-align: center;
+  }
+  .page-title {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.05em;
+    margin: 0 0 1rem !important;
+    text-align: center;
+    line-height: 1.25;
+    border-bottom: 1px solid var(--ink, #000);
+    padding-bottom: 0.5rem;
+  }
+
+  .body-lines {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    font-size: inherit;
+    line-height: inherit;
+  }
+  .body-lines > li {
+    display: grid !important;
+    grid-template-columns: 2.2em 1fr !important;
+    gap: 0.5rem;
+    align-items: baseline;
+    font-style: normal;
+    font-size: 0.96em;
+    line-height: 1.55;
+    border: none !important;
+    text-align: left;
+    padding: 0 !important;
+    opacity: 1;
+    counter-increment: none;
+  }
+  .body-lines > li:first-child { border-top: none !important; }
+  .body-lines > li::before { content: none !important; }
+  .body-lines > li .line-num {
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.62em;
+    letter-spacing: 0.06em;
+    opacity: 0.45;
+    text-align: right;
+  }
+  .body-lines > li.has-left .line-text,
+  .body-lines > li.has-right .line-text {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-size: 100% 0.8px;
+    background-position: 0 100%;
+    padding-bottom: 0.1em;
+  }
+
+  @media (max-width: 960px) {
+    .marginalia-canvas {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      padding: 0.75rem 0.25rem;
+    }
+    .marginalia-body {
+      grid-row: 1;
+      border: 1px solid var(--ink, #000);
+      padding: 1rem 0.85rem;
+    }
+    .margin-col {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      padding: 0.25rem;
+    }
+    .margin-left, .margin-right { align-items: flex-start; text-align: left; }
+    .margin-note {
+      max-width: 100%;
+      font-size: 0.76em;
+    }
+    .margin-note .note-arm {
+      width: 1.9rem;
+      margin-left: 0;
+      margin-right: auto;
+    }
+  }
+</style>

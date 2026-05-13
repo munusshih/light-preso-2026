@@ -1,6 +1,10 @@
 ---
-// Scatters children at random-feeling rotations and offsets — thrown on a desk.
-// Rotations and offsets are seeded at build time so they're stable between renders.
+// Scattered on a desk on most pages; research.css collapses to a clean grid.
+// `cols` picks 1/2/3 (or "auto" for auto-fit) when collapsed.
+interface Props {
+  cols?: 1 | 2 | 3 | "auto";
+}
+const { cols = "auto" } = Astro.props;
 const seed = [
   { r: -12, tx:  10, ty: -20 },
   { r:   7, tx: -15, ty:  25 },
@@ -13,7 +17,7 @@ const seed = [
 ];
 ---
 
-<div class="layout-random">
+<div class="layout-random" data-cols={cols}>
   <slot />
 </div>
 

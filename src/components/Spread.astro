@@ -1,9 +1,14 @@
 ---
-// Windows scattered like papers on a desk.
-// Pre-tilted via nth-child — drag from the title bar to rearrange freely.
+// Windows in a row. `cols` picks 1/2/3 (or "auto" for auto-fit).
+// On the classes/index pages this still reads as "scattered on a desk";
+// research.css collapses it into a clean grid that respects data-cols.
+interface Props {
+  cols?: 1 | 2 | 3 | "auto";
+}
+const { cols = "auto" } = Astro.props;
 ---
 
-<div class="layout-spread">
+<div class="layout-spread" data-cols={cols}>
   <slot />
 </div>
 

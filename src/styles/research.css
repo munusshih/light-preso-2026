@@ -1,0 +1,684 @@
+/* ============================================================
+   Research preso — poetic academic monograph.
+   Self-hosted Source Serif 4 (variable), pure B&W, uniform grid.
+   ============================================================ */
+
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("/fonts/source-serif/SourceSerif4Variable-Roman.woff2")
+       format("woff2-variations"),
+       url("/fonts/source-serif/SourceSerif4Variable-Roman.woff2")
+       format("woff2");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("/fonts/source-serif/SourceSerif4Variable-Italic.woff2")
+       format("woff2-variations"),
+       url("/fonts/source-serif/SourceSerif4Variable-Italic.woff2")
+       format("woff2");
+  font-weight: 200 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --paper:        #fbfaf5;
+  --paper-2:      #f4f2eb;
+  --ink:          #000000;
+  --ink-soft:     #000000;
+  --rule:         #000000;
+  --rule-soft:    #000000;
+  --muted:        #000000;
+  --serif:        "Source Serif 4", "Times New Roman", Times, Georgia, serif;
+  --measure:      62ch;
+  --measure-wide: 100%;
+  --gutter:       clamp(1.25rem, 2.4vw, 2rem);
+  /* Three sizes: heading, body, caption. Everything else inherits one of these. */
+  --fs-heading:   clamp(2.1rem, 3.3vw, 2.625rem);
+  --fs-body:      1.5rem;
+  --fs-caption:   0.82rem;
+}
+
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-weight: 400;
+  font-style: normal;
+  font-size: 19px;
+  line-height: 1.55;
+  font-feature-settings: "kern", "liga", "onum";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Printed paper effects ───────────────────────────────────────────────── */
+
+/* Subtle ink-bleed halo on every glyph */
+body {
+  text-shadow: 0 0 0.35px rgba(20, 17, 13, 0.55);
+}
+
+/* Paper grain — fixed overlay, multiply blend, covers entire viewport */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' seed='5'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 220px 220px;
+  mix-blend-mode: multiply;
+  opacity: 0.18;
+}
+
+/* Apply the SVG displacement filter to text so glyphs feel slightly ink-bled.
+   Iframes, canvases, and images stay untouched. */
+.preso-section h1,
+.preso-section h2,
+.preso-section h3,
+.preso-section p,
+.preso-section ul,
+.preso-section ol,
+.preso-section blockquote,
+.preso-section .eyebrow,
+.preso-section figcaption,
+.preso-section .sticky-note,
+.preso-section .fridge-magnets .magnet,
+.preso-section .window-title,
+.preso-section .plate-label,
+.preso-section .work-item-name {
+  filter: url(#paper-print);
+}
+
+/* ── Sections — uniform minimal padding on all four sides ────────────────── */
+.preso-section {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+  min-height: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  text-align: left !important;
+  gap: 0.8rem !important;
+  padding: clamp(1.25rem, 2.4vw, 2rem) var(--gutter) !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+/* Children can't push past the section's content box */
+.preso-section > * { min-width: 0; max-width: 100%; }
+
+.preso-section + .preso-section {
+  margin-top: 0;
+}
+
+.preso-section[data-nav-label="No pressure!"] {
+  background: var(--ink) !important;
+  color: var(--paper) !important;
+}
+.preso-section[data-nav-label="No pressure!"] a { color: var(--paper) !important; }
+
+/* Every direct child sits flush against the section's left padding edge */
+.preso-section > * {
+  margin-inline: 0 !important;
+  text-align: left !important;
+  width: 100% !important;
+  align-self: stretch !important;
+}
+
+/* Prose-width column for reading text */
+.preso-section > h1,
+.preso-section > h2,
+.preso-section > h3,
+.preso-section > p,
+.preso-section > ul,
+.preso-section > ol,
+.preso-section > blockquote,
+.preso-section > .eyebrow {
+  max-width: var(--measure) !important;
+}
+
+/* ── Eyebrow — the section title: big, bold, B&W, roman, normal tracking ── */
+.preso-section .eyebrow {
+  font-family: var(--serif) !important;
+  font-weight: 700 !important;
+  font-style: normal !important;
+  font-size: var(--fs-heading) !important;
+  letter-spacing: -0.018em !important;
+  text-transform: none !important;
+  color: var(--ink) !important;
+  opacity: 1 !important;
+  padding: 0 !important;
+  margin: 0 0 0.4rem !important;
+  border: none !important;
+  display: block !important;
+  text-align: left !important;
+  line-height: 1.1 !important;
+  max-width: 100% !important;
+}
+.preso-section .eyebrow::before,
+.preso-section .eyebrow::after { content: none !important; }
+
+.preso-section[data-nav-label="No pressure!"] .eyebrow {
+  color: var(--paper);
+  opacity: 1;
+}
+
+/* ── Headings — gentle, single weight ────────────────────────────────────── */
+body > h1 { background: transparent !important; color: var(--ink) !important; }
+
+h1,
+.preso-section h1 {
+  font-family: var(--serif) !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  letter-spacing: 0 !important;
+  line-height: 1.2 !important;
+  font-size: var(--fs-heading) !important;
+  /* unset the global full-screen / centred treatment */
+  display: block !important;
+  min-height: auto !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  padding: 0 !important;
+  text-align: left !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+  margin: 0 0 0.4rem !important;
+  width: 100% !important;
+  max-width: var(--measure) !important;
+}
+
+h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0;
+  font-size: var(--fs-heading);
+  line-height: 1.25;
+  margin: 0 !important;
+}
+
+h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: var(--fs-heading);
+  line-height: 1.25;
+  margin: 0.8em 0 0.2em !important;
+}
+
+.preso-section[data-nav-label="No pressure!"] h1,
+.preso-section[data-nav-label="No pressure!"] h2 { color: var(--paper) !important; }
+
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+p {
+  font-family: var(--serif);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0;
+  line-height: 1.65;
+  margin: 0 !important;
+  margin-inline: 0 !important;
+  max-width: var(--measure) !important;
+  color: var(--ink);
+  hanging-punctuation: first last;
+  text-align: left;
+  text-wrap: pretty;
+}
+p + p { margin-top: 1.1em !important; text-indent: 0; }
+
+.preso-section[data-nav-label="No pressure!"] p { color: var(--paper); }
+
+em, i, cite { font-style: italic; }
+strong, b { font-weight: 400; font-style: italic; }
+
+sup, sub { font-size: 0.72em; line-height: 0; }
+sup a { text-decoration: none; }
+
+code {
+  font-family: var(--serif) !important;
+  font-style: italic;
+  font-size: 1em !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* Blockquote: typographic pull quote — no border, no quote mark.
+   Indent alone signals "this is set apart". Slightly enlarged italic. */
+blockquote {
+  font-family: var(--serif) !important;
+  font-style: italic !important;
+  font-weight: 400 !important;
+  font-size: var(--fs-body) !important;
+  line-height: 1.55 !important;
+  letter-spacing: 0 !important;
+  color: var(--ink) !important;
+  text-align: left !important;
+  border: none !important;
+  margin: clamp(1.25rem, 2.4vw, 2rem) 0 clamp(1.25rem, 2.4vw, 2rem) clamp(2rem, 5vw, 4rem) !important;
+  padding: 0 !important;
+  max-width: calc(var(--measure) - 4rem) !important;
+  text-wrap: balance;
+}
+blockquote::before { content: none !important; }
+blockquote p {
+  text-indent: 0 !important;
+  margin: 0 !important;
+  font-size: inherit !important;
+  font-style: inherit !important;
+  line-height: inherit !important;
+  max-width: 100% !important;
+}
+blockquote p + p { margin-top: 0.6em !important; }
+blockquote cite {
+  display: block;
+  margin-top: 0.85rem;
+  font-style: normal;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  opacity: 0.6;
+}
+blockquote cite::before { content: "— "; }
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 0.5px;
+  text-underline-offset: 2.5px;
+}
+a:hover { text-decoration-thickness: 1px; }
+
+/* ── Lists ───────────────────────────────────────────────────────────────── */
+ul {
+  padding-left: 0;
+  list-style: none;
+  text-align: left;
+  margin: 0 !important;
+}
+ul > li {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: var(--ink);
+  opacity: 0.22;
+  transition: opacity 0.35s ease;
+  padding-block: 0.1em;
+  text-align: left;
+}
+ul > li.li-focus { opacity: 1; }
+
+/* ── Bibliography ────────────────────────────────────────────────────────── */
+.preso-section[data-nav-label="references"] h2 {
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: var(--fs-heading);
+  font-family: var(--serif);
+  padding: 0 !important;
+  border: none !important;
+  max-width: var(--measure) !important;
+}
+.preso-section[data-nav-label="references"] ul { max-width: var(--measure) !important; }
+.preso-section[data-nav-label="references"] ul > li {
+  font-family: var(--serif);
+  font-style: normal;
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  letter-spacing: 0;
+  padding-left: 2em;
+  text-indent: -2em;
+  padding-block: 0.4em;
+  border: none;
+  opacity: 1;
+}
+.preso-section[data-nav-label="references"] ul > li a { font-style: italic; }
+
+/* ── Spread / Random — clean grid, cols configurable via data-cols ───────── */
+.layout-spread,
+.layout-random {
+  display: grid !important;
+  row-gap: clamp(2rem, 4vw, 3.5rem) !important;
+  column-gap: 0.75rem !important;
+  padding: 0 !important;
+  margin: 0 0 clamp(2rem, 4vw, 3.5rem) !important;
+  width: 100% !important;
+  justify-items: stretch !important;
+  align-items: stretch !important;
+}
+
+/* Auto-fit fallback when no cols prop is set */
+.layout-spread,
+.layout-random,
+.layout-spread[data-cols="auto"],
+.layout-random[data-cols="auto"] {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)) !important;
+}
+.layout-spread[data-cols="1"],
+.layout-random[data-cols="1"] {
+  grid-template-columns: 1fr !important;
+}
+.layout-spread[data-cols="2"],
+.layout-random[data-cols="2"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+.layout-spread[data-cols="3"],
+.layout-random[data-cols="3"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+/* Kill every "scattered desk" transform */
+.layout-spread > *,
+.layout-spread > *:nth-child(n),
+.layout-random > *,
+.layout-random > *:nth-child(n) {
+  transform: none !important;
+  rotate: 0deg !important;
+  translate: 0 !important;
+  margin: 0 !important;
+}
+
+/* On narrow screens, force 1 column regardless */
+@media (max-width: 600px) {
+  .preso-section .layout-spread,
+  .preso-section .layout-random {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Window outer: kill the drag-handler's inline translate, fill its grid cell */
+.preso-section .window-outer {
+  translate: 0 !important;
+  transform: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+  cursor: default !important;
+  margin-bottom: clamp(2rem, 4vw, 3.5rem) !important;
+}
+/* Inside Spread / Random / Carousel the parent gap handles spacing — kill the
+   extra bottom margin so we don't double up. */
+.preso-section .layout-spread > .window-outer,
+.preso-section .layout-random > .window-outer,
+.preso-section .carousel-track > .window-outer {
+  margin-bottom: 0 !important;
+}
+.preso-section .window {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: flex !important;
+}
+.preso-section .window .screen {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 3 / 2 !important;
+}
+
+/* Carousel keeps its horizontal track flow — cap window width */
+.preso-section .carousel-track .window-outer {
+  width: clamp(260px, 70vw, 560px) !important;
+  flex-shrink: 0 !important;
+}
+
+/* Carousel: align to the left, no breathing-room padding */
+.carousel-track {
+  padding: 0 !important;
+  justify-content: flex-start !important;
+  gap: 0.75rem !important;
+}
+
+/* WorkList & WorkItem: flat left-aligned list */
+.work-list {
+  padding: 0 !important;
+  width: 100% !important;
+}
+.work-list ul {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0.6rem !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.work-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  text-align: left !important;
+  gap: 0.5rem !important;
+  border-bottom: 1px solid var(--rule-soft);
+  padding-block: 0.3rem !important;
+}
+.work-item:last-child { border-bottom: none; }
+.work-item-name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: var(--fs-body) !important;
+  text-align: left !important;
+  display: inline-block !important;
+}
+
+/* FridgeMagnets — left-aligned grid */
+.fridge-magnets {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-start !important;
+  gap: 0.4rem 0.35rem !important;
+  padding: 0 !important;
+}
+.fridge-magnets .magnet {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--rule);
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  font-family: var(--serif) !important;
+  font-weight: 400 !important;
+  font-style: italic !important;
+  letter-spacing: 0 !important;
+  font-size: var(--fs-body) !important;
+  text-transform: none !important;
+  padding: 0.2em 0.6em !important;
+  rotate: 0deg !important;
+  transform: none !important;
+}
+
+/* ── Window — figure frame, color media ──────────────────────────────────── */
+.window {
+  border: 1px solid var(--rule) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: var(--paper) !important;
+}
+.window-outer:hover .window { box-shadow: none !important; transform: none; }
+
+.window-bar {
+  background: var(--paper) !important;
+  border-bottom: 1px solid var(--rule) !important;
+  padding: 5px 8px !important;
+}
+.window-dots span {
+  background: var(--ink) !important;
+  opacity: 0.55;
+  width: 5px !important;
+  height: 5px !important;
+  border-radius: 50% !important;
+}
+.window-title {
+  color: var(--muted) !important;
+  font-family: var(--serif) !important;
+  font-style: italic;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  font-size: 13px !important;
+}
+.window-open { color: var(--muted) !important; }
+.window .screen,
+.window .screen-overlay { background: var(--paper-2) !important; }
+.window .screen-dot { background: var(--ink) !important; }
+.preso-section .window iframe { background: var(--paper-2) !important; }
+.preso-section .plate-img { background: var(--paper-2) !important; }
+
+/* Color plates */
+.window .media-fill { filter: none !important; }
+.window iframe { filter: none !important; }
+
+/* ── Unified caption system ──────────────────────────────────────────────────
+   Three surfaces share one treatment: italic serif, small, centered, muted.
+   - <figcaption> in every diagram component
+   - .sticky-note (Window `note` prop) — re-flowed below the window
+   - .plate-label (per-image label inside PlateDiagram)
+   ──────────────────────────────────────────────────────────────────────────── */
+.preso-section figcaption,
+.preso-section .sticky-note,
+.preso-section .plate-label {
+  font-family: var(--serif) !important;
+  font-style: italic !important;
+  font-weight: 400 !important;
+  font-size: var(--fs-caption) !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0 !important;
+  color: var(--ink) !important;
+  opacity: 0.62 !important;
+  text-align: center !important;
+  text-transform: none !important;
+  margin: 0.55rem auto 0 !important;
+  padding: 0 !important;
+  max-width: 42ch !important;
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-indent: 0 !important;
+}
+.preso-section figcaption a,
+.preso-section .sticky-note a,
+.preso-section .plate-label a { color: inherit !important; }
+
+/* Sticky note: pop it out of its absolute corner position and stack it
+   below the window as a real figcaption. */
+.preso-section .window-outer {
+  display: flex !important;
+  flex-direction: column !important;
+}
+.preso-section .sticky-note {
+  position: static !important;
+  order: 2 !important;
+  transform: none !important;
+  rotate: 0deg !important;
+  white-space: normal !important;
+  pointer-events: auto !important;
+  padding: 0.5rem 0.25rem 0 !important;
+}
+.preso-section .note-top-right,
+.preso-section .note-top-left,
+.preso-section .note-bottom-right,
+.preso-section .note-bottom-left,
+.preso-section .window-outer:hover .sticky-note { transform: none !important; rotate: 0deg !important; }
+
+/* Portrait — color */
+.portrait-frame { filter: none; }
+.portrait-frame img { border: 1px solid var(--rule); }
+
+/* ── Diagram figures — full-bleed to section edges, minimal margin ───────── */
+.preso-section > .diagram-figure {
+  margin: 0.25rem calc(-1 * var(--gutter)) clamp(2rem, 4vw, 3.5rem) !important;
+  padding: 0;
+  width: calc(100% + var(--gutter) * 2) !important;
+  max-width: none !important;
+}
+.diagram-figure .diagram-canvas {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: clamp(320px, 48vw, 620px);
+  background: transparent;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+.diagram-figure .diagram-canvas.bordered {
+  border: 1px solid #000;
+}
+@media (max-width: 600px) {
+  .diagram-figure .diagram-canvas {
+    aspect-ratio: 4 / 3;
+    min-height: clamp(280px, 64vw, 460px);
+  }
+}
+.diagram-figure .diagram-canvas canvas { display: block; }
+.diagram-figure figcaption::before { content: none; }
+
+/* PlateDiagram (image grid) stays inside the prose column */
+.preso-section > .plate-figure {
+  margin: 0.5rem 0 clamp(2rem, 4vw, 3.5rem) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+.plate-figure .plate {
+  gap: 0.6rem !important;
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  :root {
+    --gutter: clamp(1rem, 4vw, 1.5rem);
+    --fs-heading: clamp(1.55rem, 6.5vw, 1.95rem);
+    --fs-body: 1.15rem;
+    --fs-caption: 0.78rem;
+  }
+  html, body { font-size: 17px; }
+  .layout-spread,
+  .layout-random {
+    grid-template-columns: 1fr !important;
+  }
+  .preso-section > .diagram-figure .diagram-canvas {
+    height: clamp(320px, 66svh, 520px) !important;
+  }
+}
+
+/* ── Dark mode — auto-enables when OS reports prefers-color-scheme: dark ──── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper:     #14130f;
+    --paper-2:   #1c1a14;
+    --ink:       #ede8d8;
+    --ink-soft:  #ede8d8;
+    --rule:      #ede8d8;
+    --rule-soft: #ede8d8;
+    --muted:     #ede8d8;
+  }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  /* Soften the ink-bleed halo so it doesn't ring light text on dark paper */
+  body { text-shadow: 0 0 0.35px rgba(237, 232, 216, 0.35); }
+
+  /* Re-tune the paper-grain overlay: light specks via screen blend */
+  body::after {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' seed='5'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.4 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    mix-blend-mode: screen;
+    opacity: 0.10;
+  }
+
+  /* Dim embedded media so bright iframes/screenshots don't blast in dark rooms */
+  .preso-section .window iframe,
+  .preso-section .window .media-fill {
+    filter: brightness(0.88) contrast(0.96) !important;
+  }
+}

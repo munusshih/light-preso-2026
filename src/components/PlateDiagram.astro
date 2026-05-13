@@ -1,0 +1,99 @@
+---
+interface Entry {
+  src: string;
+  label: string;
+  alt?: string;
+}
+interface Props {
+  entries: Entry[];
+  columns?: number;
+  caption?: string;
+  border?: boolean;
+}
+const { entries, columns = 3, caption, border = false } = Astro.props;
+---
+
+<figure class={`diagram-figure plate-figure${border ? " bordered" : ""}`}>
+  <div class="plate" style={`--cols:${columns}`}>
+    {entries.map((e, i) => (
+      <div class="plate-entry" style={`--i:${i}`}>
+        <div class="plate-img">
+          <img src={e.src} alt={e.alt ?? e.label} loading="lazy" />
+        </div>
+        <p class="plate-label">{e.label}</p>
+      </div>
+    ))}
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .plate {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+    gap: 1.5rem 1.25rem;
+    width: 100%;
+  }
+
+  .plate-entry {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    animation: plate-breathe 9s ease-in-out infinite;
+    animation-delay: calc(var(--i) * -1.4s);
+    will-change: transform, opacity;
+  }
+
+  @keyframes plate-breathe {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+      opacity: 0.96;
+    }
+    50% {
+      transform: translateY(-3px) scale(1.005);
+      opacity: 1;
+    }
+  }
+
+  .plate-img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border: none;
+    background: #f4f2eb;
+  }
+  .plate-figure.bordered .plate-img {
+    border: 1px solid #000;
+  }
+  .plate-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .plate-label {
+    font-family: "Source Serif 4", "Times New Roman", Times, serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    line-height: 1.35;
+    color: rgb(20, 17, 13);
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .plate {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem 0.85rem;
+    }
+  }
+  @media (max-width: 480px) {
+    .plate {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plate-entry { animation: none; }
+  }
+</style>

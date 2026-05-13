@@ -1,0 +1,185 @@
+---
+/**
+ * Phylogeny / stemma codicum. A branching family tree, drawn vertically.
+ * Each entry has a parent id (or null for roots). Layout is computed
+ * automatically via depth-first traversal; positions are normalized to
+ * the canvas size at render time. Hand-drawn-feeling curved branches.
+ */
+interface PhyloNode {
+  id: string;
+  label: string;
+  /** id of the parent, or null/undefined for a root */
+  from?: string | null;
+  /** optional year/period to print under the label */
+  period?: string;
+}
+interface Props {
+  nodes: PhyloNode[];
+  caption?: string;
+  border?: boolean;
+}
+const { nodes, caption, border = false } = Astro.props;
+const uid = `phylo-${Math.random().toString(36).slice(2, 9)}`;
+const payload = JSON.stringify({ nodes });
+---
+
+<figure class="diagram-figure phylogeny-figure">
+  <div
+    class={`diagram-canvas phylogeny-canvas${border ? " bordered" : ""}`}
+    id={uid}
+    data-phylo={payload}
+  ></div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<script>
+  import { loadP5, FONT_STACK, readThemeColors, readBodyFontPx } from "../lib/p5-loader";
+
+  type PhyloNode = { id: string; label: string; from?: string | null; period?: string };
+
+  function initPhylo(container: HTMLElement) {
+    if (container.dataset.ready === "1") return;
+    container.dataset.ready = "1";
+    const { nodes } = JSON.parse(container.dataset.phylo ?? "{}") as { nodes: PhyloNode[] };
+
+    new (window as any).p5((p: any) => {
+      let W = 0;
+      let H = 0;
+      let ctx: CanvasRenderingContext2D;
+      let theme = { paper: "#fbfaf5", ink: "#000000" };
+      let bodyPx = 16;
+
+      // ── layout ─────────────────────────────────────────────────────
+      // each node gets a depth (= number of edges from root) and a column
+      // (= position among siblings in DFS order).
+      type Laid = PhyloNode & { x: number; y: number; depth: number; col: number };
+      const laid: Record<string, Laid> = {};
+      const roots: string[] = [];
+      const children: Record<string, string[]> = {};
+
+      nodes.forEach((n) => {
+        children[n.id] = [];
+        laid[n.id] = { ...n, x: 0, y: 0, depth: 0, col: 0 };
+      });
+      nodes.forEach((n) => {
+        if (n.from && laid[n.from]) children[n.from].push(n.id);
+        else roots.push(n.id);
+      });
+
+      let maxDepth = 0;
+      let leafCounter = 0;
+      function walk(id: string, depth: number): number {
+        laid[id].depth = depth;
+        maxDepth = Math.max(maxDepth, depth);
+        const kids = children[id];
+        if (!kids.length) {
+          laid[id].col = leafCounter++;
+          return laid[id].col;
+        }
+        const cols = kids.map((k) => walk(k, depth + 1));
+        const mid = (Math.min(...cols) + Math.max(...cols)) / 2;
+        laid[id].col = mid;
+        return mid;
+      }
+      roots.forEach((r) => walk(r, 0));
+      const maxCol = leafCounter - 1 || 1;
+
+      function refreshTheme() {
+        theme = readThemeColors(container);
+        bodyPx = readBodyFontPx(container);
+      }
+      function computePositions() {
+        const padX = bodyPx * 4;
+        const padY = bodyPx * 2.5;
+        Object.values(laid).forEach((n) => {
+          n.x = padX + (n.col / Math.max(1, maxCol)) * (W - 2 * padX);
+          n.y = padY + (n.depth / Math.max(1, maxDepth)) * (H - 2 * padY);
+        });
+      }
+      function setFont(size: number, italic = true, weight = 400) {
+        ctx.font = `${italic ? "italic " : ""}${weight} ${size}px ${FONT_STACK}`;
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
+      }
+
+      p.setup = () => {
+        W = container.clientWidth;
+        H = container.clientHeight;
+        const c = p.createCanvas(W, H);
+        c.parent(container);
+        ctx = p.drawingContext as CanvasRenderingContext2D;
+        refreshTheme();
+        computePositions();
+        matchMedia("(prefers-color-scheme: dark)").addEventListener("change", refreshTheme);
+      };
+      p.windowResized = () => {
+        const nw = container.clientWidth;
+        const nh = container.clientHeight;
+        if (nw === W && nh === H) return;
+        p.resizeCanvas(nw, nh);
+        W = nw;
+        H = nh;
+        refreshTheme();
+        computePositions();
+      };
+
+      p.draw = () => {
+        p.clear();
+        const t = p.millis() / 1000;
+
+        // branches first (so labels sit on top)
+        Object.values(laid).forEach((n) => {
+          if (!n.from || !laid[n.from]) return;
+          const parent = laid[n.from];
+          const breathe = Math.sin(t * 0.4 + n.x * 0.01) * 1.5;
+          p.stroke(theme.ink);
+          p.strokeWeight(0.9);
+          p.noFill();
+          // curved branch: vertical drop, then S-curve to child
+          p.bezier(
+            parent.x, parent.y + 8,
+            parent.x, (parent.y + n.y) / 2,
+            n.x + breathe, (parent.y + n.y) / 2,
+            n.x, n.y - 8
+          );
+        });
+
+        // nodes — small dot + label below
+        Object.values(laid).forEach((n) => {
+          // node dot
+          p.noStroke();
+          p.fill(theme.ink);
+          p.ellipse(n.x, n.y, 5);
+
+          // label
+          setFont(bodyPx * 0.88, true, 400);
+          // background pill so label cuts through the lines beneath
+          const textW = ctx.measureText(n.label).width;
+          const padH = bodyPx * 0.35;
+          ctx.fillStyle = theme.paper;
+          ctx.fillRect(
+            n.x - textW / 2 - padH,
+            n.y + bodyPx * 0.55,
+            textW + padH * 2,
+            bodyPx * 1.1
+          );
+          ctx.fillStyle = theme.ink;
+          ctx.fillText(n.label, n.x, n.y + bodyPx * 1.1);
+
+          // period
+          if (n.period) {
+            setFont(bodyPx * 0.62, false, 400);
+            ctx.fillStyle = theme.ink;
+            ctx.globalAlpha = 0.55;
+            ctx.fillText(n.period, n.x, n.y + bodyPx * 2);
+            ctx.globalAlpha = 1;
+          }
+        });
+      };
+    });
+  }
+
+  loadP5().then(() => {
+    document.querySelectorAll<HTMLElement>(".phylogeny-canvas").forEach((el) => initPhylo(el));
+  });
+</script>

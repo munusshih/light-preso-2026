@@ -1,0 +1,136 @@
+---
+layout: ../layouts/ClassesLayout.astro
+title: Class Sites
+---
+
+import Window from "../components/Window.astro";
+import Spread from "../components/Spread.astro";
+import Section from "../components/Section.astro";
+import Carousel from "../components/Carousel.astro";
+import FridgeMagnets from "../components/FridgeMagnets.astro";
+
+<Section eyebrow="DES — Teaching Infrastructure">
+# Class Sites.
+</Section>
+
+<Section eyebrow="What you're looking at">
+## Every course I teach gets its own site.
+
+Not a Canvas page. Not a PDF syllabus emailed on day one. A real public website — bookmarkable, linkable, indexable, alive for as long as I keep paying for the domain.
+
+<Spread>
+  <Window
+    src="https://tech-a.munusshih.com"
+    title="Tech A"
+    note="Technology A — how designers can think computationally"
+    noteColor="green"
+  />
+  <Window
+    src="https://thesis-i.munusshih.com"
+    title="Thesis I"
+    note="The first half of the thesis year"
+    noteColor="yellow"
+  />
+  <Window
+    src="https://thesis-ii.munusshih.com"
+    title="Thesis II"
+    note="The second half — making and defending"
+    noteColor="pink"
+  />
+  <Window
+    src="https://vlb.munusshih.com"
+    title="Visual Language B"
+    note="VLB — collective ways of working beyond the capitalist studio"
+    noteColor="blue"
+  />
+</Spread>
+</Section>
+
+<Section eyebrow="why bother">
+## Why a public site, instead of an LMS?
+
+A class site is a public artifact of a class. It outlasts the semester. Students can link to it on their portfolios. Future students can read what last year's class read. Anyone curious about what graduate design education looks like can just _see_ it.
+
+<FridgeMagnets terms="Public by Default, Linkable, Bookmarkable, Indexed by Google, No Login Wall, Outlasts the Semester, Forkable, Open Reading Lists, Portfolio-Linkable, Markdown, Version Controlled" />
+</Section>
+
+<Section eyebrow="what goes on them">
+## What lives on a class site
+
+The boring stuff lives there so the classroom can be about the interesting stuff.
+
+- Weekly schedule and readings
+- Assignments and prompts
+- Slides and lecture notes
+- Links to tools, references, examples
+- Showcases of past student work (with consent)
+- Office hours, contact info, the actual syllabus
+
+</Section>
+
+<Section eyebrow="what doesn't" color="#fff8e7">
+## What does *not* go on a class site
+
+Public-by-default is a feature, but it's also a constraint. The moment a class site touches grades, attendance, identifiable assessments, or anything tied to a specific student's academic record, it falls under FERPA — and FERPA does not allow that information to live on a public URL.
+
+<div class="callout">
+  <h3>FERPA — the short version</h3>
+  <p>The Family Educational Rights and Privacy Act protects "education records" — anything an institution maintains that is personally identifiable to a student. On a public class site, that means:</p>
+  <ul>
+    <li><strong>No grades.</strong> Not even partial. Not a leaderboard, not a "great work" callout with a name attached to a score.</li>
+    <li><strong>No attendance, no rosters.</strong> The list of who is enrolled is itself protected.</li>
+    <li><strong>No identifiable feedback.</strong> Critique notes, rubric scores, instructor comments tied to a named student.</li>
+    <li><strong>No student work without written consent.</strong> Even ungraded work — if it can be tied to a person, the person decides whether it's public.</li>
+    <li><strong>No emails, student IDs, or directory info</strong> beyond what the school has already designated as public directory information.</li>
+  </ul>
+</div>
+
+In practice this means I treat the class site as the **course's** record, not any **student's** record. Anything a stranger could read should be about the curriculum, not the cohort.
+</Section>
+
+<Section eyebrow="how I handle it" color="#fff">
+## How I keep student work on the site
+
+I want past students' work visible — it's the best recruiting tool a program has, and it's how next year's students learn what the class actually produces. So:
+
+- I ask, in writing, at the end of the semester. Opt-in, not opt-out.
+- I let students choose: name credited, name omitted, or work withheld entirely.
+- I never publish in-progress critique notes. Only finished work the student is proud of.
+- I keep a takedown promise: email me, it comes down the same day.
+- Grades, rubric scores, and instructor evaluations stay inside the LMS. They never touch the public site.
+
+The class site is *advertising for the class*, not a transcript of who did well in it.
+</Section>
+
+<Section eyebrow="how it's built" color="#1d2b1f" textColor="#f6f1e4">
+## The stack is boring on purpose
+
+Each site is a static Astro + MDX project, deployed to a subdomain. No database, no auth, no server. That means:
+
+- Nothing to breach. There is no user data to leak because there is no user data.
+- Free hosting forever (or close to it). Static files are cheap.
+- Forkable. A colleague can clone the repo and run their own class on the same scaffold.
+- Editable in plain markdown — no CMS to learn.
+
+</Section>
+
+<Section eyebrow="for prospective students">
+## If you're thinking about taking one of these classes
+
+Click around the sites above. Read the syllabus before you enroll. See what last semester's class read, what they made, what we argued about. That's the point.
+
+## Email me at <a href="mailto:munus.shih@pratt.edu">munus.shih@pratt.edu</a>
+
+</Section>
+
+<Section eyebrow="references" color="#f5f5f5">
+## Bibliography
+
+- "FERPA — Family Educational Rights and Privacy Act." [_studentprivacy.ed.gov_](https://studentprivacy.ed.gov/ferpa). U.S. Department of Education. Accessed May 12, 2026.
+- "Graduate Studio: Technology A." [_tech-a.munusshih.com_](https://tech-a.munusshih.com). Accessed May 12, 2026.
+- "Graduate Studio: Visual Language B." [_vlb.munusshih.com_](https://vlb.munusshih.com). Accessed May 12, 2026.
+- "Thesis I (DES-796-07)." [_thesis-i.munusshih.com_](https://thesis-i.munusshih.com). Accessed May 12, 2026.
+- "Thesis II (DES-799-07)." [_thesis-ii.munusshih.com_](https://thesis-ii.munusshih.com). Accessed May 12, 2026.
+- "Astro — the web framework for content-driven websites." [_astro.build_](https://astro.build). Accessed May 12, 2026.
+
+</Section>

@@ -1,0 +1,240 @@
+---
+/**
+ * Anatomical key. A central abstract "body" shape, with leader lines
+ * pointing outward to labels in the margin. Each "organ" has a small
+ * glyph (a Roman numeral letter or a marker) at its position; the leader
+ * elbows out to the side and ends in a label. Reads like a 19th-century
+ * natural-philosophy figure.
+ */
+interface Organ {
+  /** position 0..1 normalized to the central body box */
+  x: number;
+  y: number;
+  /** label, e.g. "I. Open Source" */
+  label: string;
+  /** which side the label sits on */
+  side?: "left" | "right";
+  /** optional gloss line under the label */
+  gloss?: string;
+}
+interface Props {
+  /** the title hanging above the figure, e.g. "Fig. III. — Anatomy of practice" */
+  title?: string;
+  organs: Organ[];
+  caption?: string;
+}
+const { title, organs, caption } = Astro.props;
+const numerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
+---
+
+<figure class="diagram-figure anatomy-figure">
+  <div class="anatomy-canvas">
+    {title && <p class="anatomy-title">{title}</p>}
+    <div class="anatomy-stage">
+      <!-- Central body — an abstract organ form, hand-drawn-feeling -->
+      <svg class="anatomy-body" viewBox="0 0 200 260" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <defs>
+          <filter id="anatomy-wobble">
+            <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="3"/>
+            <feDisplacementMap in="SourceGraphic" scale="3"/>
+          </filter>
+          <pattern id="anatomy-hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="6" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
+          </pattern>
+        </defs>
+        <!-- amphora / heart / vessel silhouette -->
+        <path
+          d="M 100 18
+             C 70 22 50 38 50 70
+             C 50 92 60 110 65 130
+             C 70 150 55 170 55 195
+             C 55 230 80 252 100 252
+             C 120 252 145 230 145 195
+             C 145 170 130 150 135 130
+             C 140 110 150 92 150 70
+             C 150 38 130 22 100 18 Z"
+          fill="url(#anatomy-hatch)"
+          stroke="currentColor"
+          stroke-width="1.2"
+          filter="url(#anatomy-wobble)"
+        />
+        <!-- inner contour line for depth -->
+        <path
+          d="M 100 32
+             C 78 36 64 50 64 72
+             C 64 92 76 112 78 134
+             C 80 156 70 174 70 196
+             C 70 222 88 240 100 240"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="0.6"
+          opacity="0.4"
+        />
+
+        <!-- organ markers + leader lines -->
+        {organs.map((o, i) => {
+          const cx = o.x * 200;
+          const cy = o.y * 260;
+          const side = o.side ?? (cx < 100 ? "left" : "right");
+          const elbowX = side === "left" ? -40 : 240;
+          const labelX = side === "left" ? -50 : 250;
+          return (
+            <g>
+              <line
+                x1={cx}
+                y1={cy}
+                x2={elbowX}
+                y2={cy}
+                stroke="currentColor"
+                stroke-width="0.6"
+                stroke-dasharray="2 2"
+                opacity="0.7"
+              />
+              <circle cx={cx} cy={cy} r="4" fill="currentColor" />
+              <circle cx={cx} cy={cy} r="7" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.5" />
+              <text
+                x={labelX}
+                y={cy}
+                font-family="Source Code Pro, monospace"
+                font-size="9"
+                fill="currentColor"
+                text-anchor={side === "left" ? "end" : "start"}
+                dominant-baseline="middle"
+                opacity="0.55"
+              >{numerals[i] ?? i + 1}</text>
+            </g>
+          );
+        })}
+      </svg>
+
+      <!-- labels positioned absolutely on each side -->
+      <ul class="anatomy-labels labels-left">
+        {organs
+          .filter((o) => (o.side ?? (o.x < 0.5 ? "left" : "right")) === "left")
+          .map((o, i) => (
+            <li style={`--y:${o.y * 100}%`}>
+              <span class="organ-num">{numerals[organs.indexOf(o)] ?? organs.indexOf(o) + 1}</span>
+              <span class="organ-label">{o.label}</span>
+              {o.gloss && <span class="organ-gloss">{o.gloss}</span>}
+            </li>
+          ))}
+      </ul>
+      <ul class="anatomy-labels labels-right">
+        {organs
+          .filter((o) => (o.side ?? (o.x < 0.5 ? "left" : "right")) === "right")
+          .map((o, i) => (
+            <li style={`--y:${o.y * 100}%`}>
+              <span class="organ-num">{numerals[organs.indexOf(o)] ?? organs.indexOf(o) + 1}</span>
+              <span class="organ-label">{o.label}</span>
+              {o.gloss && <span class="organ-gloss">{o.gloss}</span>}
+            </li>
+          ))}
+      </ul>
+    </div>
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .anatomy-canvas {
+    color: var(--ink, #000);
+    font-family: "Source Serif 4", "Times New Roman", Times, serif;
+    padding: 1rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .anatomy-title {
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.72em !important;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin: 0 !important;
+    padding: 0;
+    text-align: center;
+  }
+  .anatomy-stage {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+    align-items: stretch;
+    width: 100%;
+    max-width: 44rem;
+    position: relative;
+  }
+  .anatomy-body {
+    width: 12rem;
+    height: 16rem;
+    color: var(--ink, #000);
+    grid-column: 2 / 3;
+  }
+  .anatomy-labels {
+    list-style: none;
+    padding: 0;
+    margin: 0 !important;
+    position: relative;
+    min-height: 16rem;
+    width: 100%;
+    text-align: left;
+  }
+  .anatomy-labels > li {
+    position: absolute;
+    top: var(--y);
+    transform: translateY(-50%);
+    max-width: 100%;
+    display: flex !important;
+    flex-wrap: wrap;
+    column-gap: 0.4rem;
+    align-items: baseline;
+    opacity: 1 !important;
+    text-align: left;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    letter-spacing: 0 !important;
+    font-size: 0.95em !important;
+    line-height: 1.3 !important;
+    padding-block: 0 !important;
+    color: var(--ink, #000) !important;
+    transition: none !important;
+  }
+  .labels-left { grid-column: 1 / 2; }
+  .labels-left li { right: 0.6rem; justify-content: flex-end; text-align: right; }
+  .labels-right { grid-column: 3 / 4; }
+  .labels-right li { left: 0.6rem; }
+  .organ-num {
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.62em;
+    opacity: 0.5;
+    letter-spacing: 0.08em;
+    padding: 0.05em 0.4em;
+    border: 1px solid var(--ink, #000);
+    line-height: 1;
+    font-style: normal;
+  }
+  .organ-label {
+    font-style: italic;
+    font-weight: 400;
+  }
+  .organ-gloss {
+    flex-basis: 100%;
+    font-style: italic;
+    font-size: 0.78em;
+    opacity: 0.6;
+    line-height: 1.35;
+    margin-top: 0.15rem;
+  }
+  @media (max-width: 720px) {
+    .anatomy-stage { grid-template-columns: 1fr; }
+    .anatomy-body { grid-column: 1; margin: 0 auto; }
+    .anatomy-labels { position: static; min-height: auto; margin-top: 1rem !important; }
+    .anatomy-labels li {
+      position: static;
+      transform: none;
+      text-align: left !important;
+      justify-content: flex-start !important;
+      padding-block: 0.25rem;
+    }
+  }
+</style>

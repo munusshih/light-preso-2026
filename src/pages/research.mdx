@@ -1,0 +1,507 @@
+---
+layout: ../layouts/ResearchLayout.astro
+title: Meet Munus
+---
+
+import Window from "../components/Window.astro";
+import Spread from "../components/Spread.astro";
+import Section from "../components/Section.astro";
+import WorkList from "../components/WorkList.astro";
+import WorkItem from "../components/WorkItem.astro";
+import Carousel from "../components/Carousel.astro";
+import Random from "../components/Random.astro";
+import FridgeMagnets from "../components/FridgeMagnets.astro";
+import ConceptMap from "../components/ConceptMap.astro";
+import OrbitDiagram from "../components/OrbitDiagram.astro";
+import TimelineDiagram from "../components/TimelineDiagram.astro";
+import VennDiagram from "../components/VennDiagram.astro";
+import ConstellationDiagram from "../components/ConstellationDiagram.astro";
+import PlateDiagram from "../components/PlateDiagram.astro";
+import MatrixDiagram from "../components/MatrixDiagram.astro";
+import CardCatalogDiagram from "../components/CardCatalogDiagram.astro";
+import StratumDiagram from "../components/StratumDiagram.astro";
+import BracketDiagram from "../components/BracketDiagram.astro";
+import MarginaliaDiagram from "../components/MarginaliaDiagram.astro";
+import PhylogenyDiagram from "../components/PhylogenyDiagram.astro";
+import AnatomyDiagram from "../components/AnatomyDiagram.astro";
+import LatticeDiagram from "../components/LatticeDiagram.astro";
+import RoseDiagram from "../components/RoseDiagram.astro";
+import LedgerDiagram from "../components/LedgerDiagram.astro";
+
+<Section eyebrow="">
+
+# Post-Capitalist Desires
+
+## Munus Shih, May 14, 2026
+
+<ConceptMap
+  caption="A loose map of the threads of my scholarly interest"
+  concepts={[
+    { id: "os", label: "Open Source" },
+    { id: "mutual", label: "Mutual Aid" },
+    { id: "coop", label: "Cooperative Practice" },
+    { id: "ped", label: "Critical Pedagogy" },
+    { id: "pub", label: "Experimental Publishing" },
+    { id: "archive", label: "Archival Practice" },
+    { id: "tools", label: "Digital Toolmaking" },
+    { id: "code", label: "Poetic Computation" },
+  ]}
+  connections={[
+    // Open source as the ethic underneath
+    { from: "os", to: "tools", label: "licenses" },
+    { from: "os", to: "coop", label: "shares ethos with" },
+    { from: "os", to: "archive", label: "keeps public", dashed: true },
+    { from: "os", to: "pub", label: "forks", dashed: true },
+    { from: "os", to: "mutual", label: "inspires", dashed: true },
+
+    // Mutual aid → cooperative practice → pedagogy
+    { from: "mutual", to: "coop", label: "formalizes into" },
+    { from: "coop", to: "ped", label: "taught through" },
+    { from: "coop", to: "tools", label: "maintains" },
+
+    // Pedagogy as connective tissue
+    { from: "ped", to: "pub", label: "circulates as" },
+    { from: "ped", to: "tools", label: "critiques", dashed: true },
+    { from: "ped", to: "archive", label: "creates" },
+    { from: "ped", to: "code", label: "informs" },
+
+    // Tools ↔ code: productive tension
+    { from: "tools", to: "code", label: "in tension with" },
+    { from: "tools", to: "pub", label: "produces" },
+    { from: "tools", to: "pub", label: "makes it possible" },
+
+    // Publishing as the gathering point
+    { from: "pub", to: "archive", label: "becomes" },
+    { from: "archive", to: "ped", label: "feeds back into", dashed: true },
+
+]}
+/>
+
+I've been having these impulses to make, read and collect things under these umbrella terms for a while now, and I have just started to piece them together into a more coherent inquiry on what can only be called "Post-Capitalist Desire", inspired by Mark Fisher's book of the same title.
+
+</Section>
+<Section eyebrow="">
+  ## First thing first, I'm a designer who makes his own tool.
+
+I've made many tools for myself and others to make things. At the fall of last year, I was working as a Designer in Residence at Processing Foundation, helping to experiment with using code/p5.js as a completely standalone ecosystem for making design.
+
+[insert openAssembly]
+
+There's something fundamentally different about coding your own tool vs using a sole-proprietary software. It can be accurately described as owning one's means of production by Marx, where designers now often don't own the software they use to make things, and are at the mercy of the software's updates, pricing, and corporate decisions.
+
+> What does it mean when we can't even open our own design files later when we stop paying for the software? When we say our design value is not in the final output but in the process of making, what does it mean when we don't even have access to the process after?
+
+</Section>
+
+<Section eyebrow="">
+<Spread>
+  <Window
+    src="https://openprocessing.org/sketch/1897656/embed/"
+    title="p5.zine"
+    note="p5.zine is a tool for making an interactive and generative zine with p5.js"
+    noteColor="green"
+  />
+  <Window
+    src="https://editor.p5js.org/munusshih/full/-JiQEqzeK"
+    title="p5.book"
+    note="A tool for creating books with code. It can export to PDF with saddle stitch and bleed settings."
+    noteColor="blue"
+  />
+</Spread>
+
+I have a pretty standard practice of making tools now and shipping these designs to clients without engaging with other people's software. For instance, I was able to successfully create the entire design for the AIGA 50 Books x 50 Covers Exhibition using HTML, CSS, JS. I'm working on making more tools and open-sourcing them so that more people can use them and build on top of them. I also want to make it easier for non-coders to use these tools, and to create more resources and documentation for them.
+
+<Window
+  src="https://www.munusshih.com/assets/aiga-books/04.JPG"
+  title="AIGA 50 Books x 50 Covers Exhibition"
+  note="In collaboration with Gaia Hwang, Marily Papanastasatou, Ananya Soogoor and Yashasyaa Arya"
+/>
+
+"the master's tools will never dismantle the master's house", from there I've been thinking about how difficult it is to create a sustainable practice for others, building open source projects without institutional support. How do you maintain a tool's intent to be open and free when it relys on the same maintenace and care as any other software? How could you then allocate resources to continue growing the community without relying on corporate sponsorship, philanthropic funding, or venture capital?
+
+<TimelineDiagram
+  events={[
+    { year: "2019", label: "first p5 sketch" },
+    { year: "2021", label: "p5.zine" },
+    { year: "2023", label: "p5.book" },
+    { year: "2024", label: "AIGA 50 Books" },
+    { year: "2025", label: "Open Assembly" },
+    { year: "2026", label: "this preso" },
+  ]}
+  caption="A short genealogy of the tools, and the projects each one made possible."
+/>
+
+</Section>
+
+<Section eyebrow="" color="#BDE0F5">
+  ## A more economic view at design and the labor issues of design workers.
+
+I've collaborated with other artists and researchers to produce exhibitions, workshops, and publications.
+
+<Window
+  src="https://www.munusshih.com/assets/syllabus-subject/02.jpg"
+  title="Syllabus (Subject to Change)"
+  note="Collaborated with Nikki Makagiansar, Franco Chen, Em DeVincentis, Showcased at NEW INC x Demo Festival 2025"
+  noteColor="green"
+/>
+<Window
+  src="https://www.munusshih.com/assets/threads/smoke.mp4"
+  title="Threads of Memory"
+  note="Conversation between Anoushka Bhalla, Alexandria Deters and Munus Shih, showcased at Accent Sisters"
+  noteColor="pink"
+/>
+<Window
+  src="/assets/ntu01.jpg"
+  title="Practicing Ecological Distance"
+  note="Collaborated with Ihao Liao and Chun-Huang Lin"
+/>
+
+But more specifically how to escape the extractive and exploitative nature of design work, and to create a more sustainable, equitable and cooperative structure for ourselves, where we can share resources, knowledge, and support each other in our work.
+
+  <VennDiagram
+    circles={[
+      { label: "Open Source" },
+      { label: "Pedagogy" },
+      { label: "Cooperation" },
+    ]}
+    intersections={[
+      { idx: [0, 1], label: "toolmaking" },
+      { idx: [1, 2], label: "solidarity" },
+      { idx: [0, 2], label: "mutual aid" },
+      { idx: [0, 1, 2], label: "resilient practice" },
+    ]}
+    caption="The three concerns my work keeps returning to, and the practices that live in their overlaps."
+  />
+</Section>
+
+<Section eyebrow="" color="rgb(255, 248, 112)">
+  # I run a cooperative!
+
+With my two best friends [Tzuyun Wei](https://www.behance.net/tzutzu) and [Ihao Liao](https://www.behance.net/onemoooooor) we founded a cooperative called [CoAssembly](https://www.coassembly.co/), where we research, design and publish work with labor organizaton and mutual aid as the core of our practice.
+
+We've been formalizing our practice and also take in clients like Asian Labor Future, Secret Riso Club who are interested in working with us through a more mutual aid model, where we engage also in non-monetary exchange but written into the contract.
+
+<Random>
+  <Window
+    src="/assets/sponact-1.jpg"
+    title="CoAssembly"
+    note="design co-op"
+    noteColor="yellow"
+  />
+  <Window
+    src="/assets/sponact-2.jpg"
+    title="PCD Taiwan"
+    note="Art Bookfair in Taipei"
+    noteColor="green"
+  />
+  <Window
+    src="/assets/sponact-3.png"
+    title="Recent Publication"
+    note="new book!"
+    noteColor="pink"
+  />
+  <Window
+    src="/assets/sponact-4.png"
+    title="Recent Publication"
+    note="new exhibition at National Taiwan University!"
+    noteColor="blue"
+  />
+</Random>
+
+</Section>
+
+<Section eyebrow="However, thesis is not about me..." color="white">
+  # Lastly could that be adopted in teaching, learning in the age of AI?
+
+I've started a study group called "Critical AI ..." where we meet once a month to read and discuss texts on the critical and creative use of AI in design. I just facilitated a discussion on how educational psychology can inform our teaching practice in the age of AI, and how we can use AI to support different learning styles and needs.
+
+[insert chairs]
+
+We're operating on a mutual aid model and will have future sessions on building your own local, private, open source AI tools for design, all the content are open sourced as well.
+
+<PlateDiagram
+  entries={[
+    {
+      src: "/assets/aiga-books/04.JPG",
+      label: "Collective design — AIGA 50 Books",
+    },
+    { src: "/assets/ntu01.jpg", label: "Ecological Distance, Taipei" },
+    { src: "/assets/sponact-3.png", label: "Cooperative publication" },
+    {
+      src: "/assets/sponact-4.png",
+      label: "Exhibition, National Taiwan University",
+    },
+    { src: "/assets/books.jpg", label: "Student book objects" },
+    { src: "/assets/preso.JPG", label: "Critique sessions" },
+  ]}
+  caption="Specimens of recent works — drawn from teaching, cooperative practice, and exhibitions. Each carries a different kind of authorship."
+/>
+
+</Section>
+
+<Section eyebrow="We will work well if..." color="white">
+  ## We will work well together if...
+
+  <Carousel>
+    <Window
+      src="https://kyl.neocities.org/books/%5BSOC%20FIS%5D%20postcapitalist%20desire%20-%20the%20final%20lectures.pdf"
+      title="Postcapitalist Desire"
+      note="You're a book lover, I've been diving into this book by Mark Fisher's lectures on capitalism. I read many books as part of my research and I want to share them with you!"
+      noteColor="blue"
+    />
+    <Window
+      src="/assets/nora.png"
+      title="Nora (Huixin) Wang"
+      note="You love archive, index and collection. This work by Nora Wang archives nostalgic commercial products in China and the authentic memories associated with them in the age of globalization and capitalism."
+      noteColor="yellow"
+    />
+    <Window
+      src="/assets/Jenelle.jpeg"
+      title="Jenelle (Wenjing) Zhao"
+      note="You investigate systems and power! Jenelle Zhao's work ____topia is speculative storytelling kit that invites users to imagine and build alternative worlds that rejects the common dystopian and utopian narratives and instead embraces the complexity and contradictions of our world."
+      noteColor="pink"
+    />
+    <Window
+      src="/assets/preso.JPG"
+      title="crits"
+      note="You love preso and crits! We will have regular preso and crits sessions to share our work and get feedback from each other. I will also invite guest critics to join us and provide feedback on your work."
+      noteColor="green"
+    />
+    <Window
+      src="/assets/books.jpg"
+      title="Me with Student Books"
+      note="You are experimental! I will support you in making the work that you want to make, not the work that I want you to make. I will also encourage you to experiment with different mediums, formats, and tools to find the best way to express your ideas."
+      noteColor="blue"
+    />
+  </Carousel>
+</Section>
+
+
+<Section eyebrow="diagram experiments">
+
+# Diagram experiments
+
+A field of alternative ways to render the same kinds of relationships — for review. Each one trades on a different scholarly metaphor.
+
+## 1. MatrixDiagram — cross-tabulation
+
+<MatrixDiagram
+  concepts={[
+    { label: "Open Source" },
+    { label: "Pedagogy" },
+    { label: "Cooperation" },
+  ]}
+  pairs={[
+    { idx: [0, 1], label: "toolmaking" },
+    { idx: [1, 2], label: "solidarity" },
+    { idx: [0, 2], label: "mutual aid" },
+  ]}
+  triple="resilient practice"
+  caption="Three concerns of practice tabulated as a symmetric matrix. Diagonal cells are the concepts themselves; off-diagonal cells name what lives in each overlap."
+/>
+
+## 2. CardCatalogDiagram — Zettelkasten
+
+<CardCatalogDiagram
+  caption="A working reading-card system. Each card gathers texts, makers, and lineages around one concern of the practice."
+  cards={[
+    {
+      title: "Cooperative",
+      meta: "Worker-ownership, mutual aid",
+      items: [
+        "Erik Olin Wright — Envisioning Real Utopias",
+        "Caroline Woolard — Art.coop",
+        "Trebor Scholz — Platform Cooperativism",
+        "Marina Sitrin — Horizontalism",
+      ],
+    },
+    {
+      title: "Publishing",
+      meta: "Independent + experimental",
+      items: [
+        "Common Knowledge",
+        "Are.na editorial",
+        "Triple Canopy",
+        "Punctum Books",
+      ],
+    },
+    {
+      title: "Pedagogy",
+      meta: "Critical + liberatory",
+      items: [
+        "bell hooks — Teaching to Transgress",
+        "Paulo Freire — Pedagogy of the Oppressed",
+        "Jack Halberstam — The Queer Art of Failure",
+      ],
+    },
+    {
+      title: "Computation",
+      meta: "Poetic / vernacular",
+      items: [
+        "Allison Parrish",
+        "Lauren McCarthy — p5.js",
+        "Daniel Temkin — esolangs",
+        "Nick Montfort",
+      ],
+    },
+    {
+      title: "Archive",
+      meta: "Counter-archival practice",
+      items: [
+        "Tina Campt — Listening to Images",
+        "Saidiya Hartman — Wayward Lives",
+        "Black Zine Fair archive",
+      ],
+    },
+  ]}
+/>
+
+## 3. StratumDiagram — geological column
+
+<StratumDiagram
+  caption="Reading the practice as strata. Bottom layer = first p5 sketch; surface = present-day. Hatching marks the type of work (tools / books / exhibitions)."
+  strata={[
+    { label: "this preso", period: "2026", pattern: "solid", weight: 1 },
+    { label: "Open Assembly", period: "2025", pattern: "diag", weight: 1.5 },
+    { label: "AIGA 50 Books × 50 Covers", period: "2024", pattern: "cross", weight: 2 },
+    { label: "p5.book", period: "2023", pattern: "diag", weight: 1 },
+    { label: "p5.zine", period: "2021", pattern: "dots", weight: 1.5 },
+    { label: "first p5 sketch", period: "2019", pattern: "waves", weight: 1 },
+  ]}
+/>
+
+## 4. BracketDiagram — bracketed catalog
+
+<BracketDiagram
+  masterLabel="a resilient design practice"
+  caption="Sources of the practice, grouped with hand-drawn braces. Each cluster is a different mode of working; together they constitute the master category."
+  groups={[
+    {
+      label: "Tools",
+      gloss: "Built so the work could exist at all.",
+      items: ["first p5 sketch (2019)", "p5.zine (2021)", "p5.book (2023)"],
+    },
+    {
+      label: "Books",
+      gloss: "Outputs that found their own readers.",
+      items: ["AIGA 50 Books × 50 Covers (2024)", "Recent publications (2025–)"],
+    },
+    {
+      label: "Assemblies",
+      gloss: "Gatherings, exhibitions, classrooms.",
+      items: ["Open Assembly (2025)", "PCD Taiwan (2025)", "this preso (2026)"],
+    },
+  ]}
+/>
+
+## 5. MarginaliaDiagram — annotated page
+
+<MarginaliaDiagram
+  section="preface, § ii"
+  title="On the resilience of small practices"
+  caption="A page from the practice, with marginalia. The notes are the kind of glosses a reader leaves on a book they've returned to many times."
+  body={[
+    "Every tool I build is, in some sense, a refusal — a refusal of the proprietary software that conditions",
+    "what kinds of design are even thinkable. The act of writing a small p5 sketch in 2019 looked, at the",
+    "time, like a pedagogical exercise; in retrospect it was the seed of a longer political commitment.",
+    "When p5.zine appeared, it carried that seed into a form that other people could plant. p5.book",
+    "carried it further: into objects, into the AIGA 50 Books exhibition, into the hands of strangers.",
+    "What ties these together is not a software stack but a stance — that the conditions of one's",
+    "practice should themselves be open to renegotiation. Tools, in this view, are arguments.",
+  ]}
+  annotations={[
+    { line: 0, side: "left", text: "cf. Lorde, 'the master's tools…'" },
+    { line: 2, side: "right", text: "but the seed metaphor is doing a lot of work here — see Hartman on cultivation." },
+    { line: 4, side: "left", text: "this is the genealogy chapter, see Stratum fig. 3." },
+    { line: 6, side: "right", text: "Latour: tools as actants, not instruments." },
+  ]}
+/>
+
+## 6. PhylogenyDiagram — lineage tree
+
+<PhylogenyDiagram
+  caption="Each project descends from prior projects. Branching marks where a single tool seeded multiple outputs. Read top-to-bottom as time flowing forward."
+  nodes={[
+    { id: "p5_19", label: "first p5 sketch", period: "2019" },
+    { id: "p5_zine", label: "p5.zine", period: "2021", from: "p5_19" },
+    { id: "p5_book", label: "p5.book", period: "2023", from: "p5_zine" },
+    { id: "aiga", label: "AIGA 50 Books", period: "2024", from: "p5_book" },
+    { id: "openasm", label: "Open Assembly", period: "2025", from: "p5_zine" },
+    { id: "preso", label: "this preso", period: "2026", from: "p5_book" },
+  ]}
+/>
+
+## 7. AnatomyDiagram — anatomical key
+
+<AnatomyDiagram
+  title="Fig. III — Anatomy of a resilient practice"
+  caption="The body of practice, dissected. Each labeled organ is one concern; the connective tissue between them is what the practice actually feels like to live inside."
+  organs={[
+    { x: 0.30, y: 0.18, label: "Open Source", side: "left",  gloss: "the licence and ethic of the practice" },
+    { x: 0.72, y: 0.28, label: "Pedagogy",    side: "right", gloss: "how the practice circulates" },
+    { x: 0.22, y: 0.55, label: "Cooperation", side: "left",  gloss: "the form of working together" },
+    { x: 0.78, y: 0.58, label: "Publishing",  side: "right", gloss: "the public face of the practice" },
+    { x: 0.30, y: 0.86, label: "Archive",     side: "left",  gloss: "what survives the year" },
+    { x: 0.74, y: 0.86, label: "Computation", side: "right", gloss: "the medium it speaks in" },
+  ]}
+/>
+
+## 8. LatticeDiagram — Hasse diagram
+
+<LatticeDiagram
+  caption="A partial-order lattice of practice. Top row are the elemental commitments; lower rows show what they combine into; the bottom node is the resilient whole. Edges mark inclusion."
+  nodes={[
+    { id: "os",    label: "Open Source",  level: 2 },
+    { id: "ped",   label: "Pedagogy",     level: 2 },
+    { id: "coop",  label: "Cooperation",  level: 2 },
+    { id: "tool",  label: "toolmaking",   level: 1 },
+    { id: "sol",   label: "solidarity",   level: 1 },
+    { id: "mut",   label: "mutual aid",   level: 1 },
+    { id: "all",   label: "resilient practice", level: 0 },
+  ]}
+  edges={[
+    { from: "os",   to: "tool" },
+    { from: "ped",  to: "tool" },
+    { from: "ped",  to: "sol" },
+    { from: "coop", to: "sol" },
+    { from: "os",   to: "mut" },
+    { from: "coop", to: "mut" },
+    { from: "tool", to: "all" },
+    { from: "sol",  to: "all" },
+    { from: "mut",  to: "all" },
+  ]}
+/>
+
+## 9. RoseDiagram — Nightingale coxcomb
+
+<RoseDiagram
+  centerLabel="practice"
+  caption="A coxcomb chart of where time and attention go. Each petal's radius is proportional to the share of a year's work spent in that mode."
+  petals={[
+    { label: "Toolmaking",        value: 9,  pattern: "diag" },
+    { label: "Publishing",        value: 7,  pattern: "dots" },
+    { label: "Teaching",          value: 5,  pattern: "cross" },
+    { label: "Cooperative work",  value: 8,  pattern: "solid" },
+    { label: "Exhibitions",       value: 4,  pattern: "open" },
+    { label: "Archive",           value: 6,  pattern: "diag" },
+  ]}
+/>
+
+## 10. LedgerDiagram — double-entry account
+
+<LedgerDiagram
+  title="Ledger of debts and gifts, AY 2025–26"
+  debitHead="received"
+  creditHead="given"
+  caption="An accountant's view of a year's practice. Each row balances what came in (mentorship, time, code) against what was given (workshops, books, tools)."
+  entries={[
+    { when: "Aug '25",  debit: "Mentorship from Patt Vira",         credit: "Open Assembly, with Patt Vira",        gloss: "co-built; both directions" },
+    { when: "Oct '25",  debit: "Books read in cooperative theory",  credit: "Class sessions on platform co-ops",    gloss: "study circle → seminar" },
+    { when: "Dec '25",  debit: "Source code from p5.js community",  credit: "p5.book published as open source",     gloss: "the licence is mutual" },
+    { when: "Feb '26",  debit: "Hospitality at PCD Taiwan",         credit: "Bookfair labour with CoAssembly" },
+    { when: "Apr '26",  debit: "Time + critique from advisors",     credit: "this preso, returned to advisors",     gloss: "the gift cycles back" },
+  ]}
+  tally={{ debit: "many", credit: "more than I can name" }}
+/>
+
+</Section>

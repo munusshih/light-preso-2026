@@ -1,0 +1,150 @@
+---
+/**
+ * Zettelkasten-style index cards. Each entry renders as a paper card with
+ * a heading, a divider rule, and a hand-numbered list of items. Cards sit
+ * in a slightly fanned grid, like a researcher pulled them out and laid them
+ * across a table.
+ */
+interface Card {
+  title: string;
+  /** optional one-line subhead under the title (e.g. a year or context tag) */
+  meta?: string;
+  items: string[];
+}
+interface Props {
+  cards: Card[];
+  caption?: string;
+}
+const { cards, caption } = Astro.props;
+const tilts = [-1.5, 1.2, -0.8, 1.6, -1.1, 0.9, -1.8, 1.3];
+---
+
+<figure class="diagram-figure card-catalog-figure">
+  <div class="card-catalog">
+    {cards.map((c, i) => (
+      <article class="catalog-card" style={`--tilt:${tilts[i % tilts.length]}deg`}>
+        <header class="card-head">
+          <span class="card-num">{String(i + 1).padStart(2, "0")}</span>
+          <span class="card-title">{c.title}</span>
+        </header>
+        {c.meta && <p class="card-meta">{c.meta}</p>}
+        <div class="card-rule"></div>
+        <ol class="card-items">
+          {c.items.map((it) => <li>{it}</li>)}
+        </ol>
+      </article>
+    ))}
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .card-catalog {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: 1.25rem 1rem;
+    padding: 1rem 0.5rem;
+  }
+  .catalog-card {
+    background: transparent;
+    color: var(--ink, #000);
+    border: 1px solid var(--ink, #000);
+    padding: 0.85rem 1rem 1rem;
+    font-family: "Source Serif 4", "Times New Roman", Times, serif;
+    position: relative;
+    transform: rotate(var(--tilt));
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 13rem;
+  }
+  .catalog-card::before {
+    content: "";
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    right: 0.5rem;
+    height: 1px;
+    background: var(--ink, #000);
+    opacity: 0.35;
+  }
+  .catalog-card:hover { transform: rotate(0) scale(1.02); }
+
+  .card-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+  .card-num {
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.7em;
+    letter-spacing: 0.08em;
+    opacity: 0.5;
+    border: 1px solid var(--ink, #000);
+    padding: 0.05em 0.4em;
+    line-height: 1;
+  }
+  .card-title {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 1.05em;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  .card-meta {
+    font-style: italic;
+    font-size: 0.82em;
+    margin: 0 !important;
+    opacity: 0.7;
+    padding: 0;
+  }
+  .card-rule {
+    height: 1px;
+    background: var(--ink, #000);
+    opacity: 0.45;
+    margin: 0.1rem 0 0.2rem;
+  }
+  .card-items {
+    list-style: none;
+    counter-reset: itm;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: inherit;
+    line-height: inherit;
+  }
+  .card-items > li {
+    counter-increment: itm;
+    display: block !important;
+    grid-template-columns: none !important;
+    border: none !important;
+    padding: 0 0 0 1.4em !important;
+    font-style: italic;
+    font-size: 0.92em;
+    line-height: 1.4;
+    position: relative;
+    opacity: 1;
+    text-align: left;
+  }
+  .card-items > li:first-child { border-top: none !important; }
+  .card-items > li::before {
+    content: counter(itm, lower-roman) "." !important;
+    position: absolute;
+    left: 0;
+    width: 1.2em;
+    text-align: right;
+    font-style: normal;
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.7em;
+    opacity: 0.5;
+    top: 0.25em;
+    /* the global `ol > li::before` declares 5+ unrelated properties — reset
+       the ones we don't want here */
+    align-self: auto;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+</style>

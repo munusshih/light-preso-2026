@@ -1,0 +1,233 @@
+---
+/**
+ * Bracket diagram. A list of items on the left, with hand-drawn curly braces
+ * grouping consecutive items into named clusters on the right. Reads like
+ * the kind of annotated outline you'd find in the margin of a scholarly
+ * treatise: { these three } are species of X.
+ */
+interface Group {
+  label: string;
+  items: string[];
+  /** optional gloss line under the group label */
+  gloss?: string;
+}
+interface Props {
+  groups: Group[];
+  /** top-level label gathering all groups under one master brace */
+  masterLabel?: string;
+  caption?: string;
+}
+const { groups, masterLabel, caption } = Astro.props;
+---
+
+<figure class="diagram-figure bracket-figure">
+  <div class="diagram-canvas bracket-canvas">
+    <div class="bracket-rows">
+      {groups.map((g) => (
+        <div class="bracket-row">
+          <ol class="bracket-items">
+            {g.items.map((it) => (
+              <li><span class="item-rule">———</span> {it}</li>
+            ))}
+          </ol>
+          <div class="bracket-arm" aria-hidden="true">
+            <svg viewBox="0 0 24 100" preserveAspectRatio="none">
+              <path
+                d="M 22 2 Q 4 2 4 28 Q 4 50 2 50 Q 4 50 4 72 Q 4 98 22 98"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.2"
+              />
+            </svg>
+          </div>
+          <div class="bracket-label">
+            <p class="g-label">{g.label}</p>
+            {g.gloss && <p class="g-gloss">{g.gloss}</p>}
+          </div>
+        </div>
+      ))}
+    </div>
+    {masterLabel && (
+      <>
+        <div class="master-arm" aria-hidden="true">
+          <svg viewBox="0 0 16 200" preserveAspectRatio="none">
+            <path
+              d="M 14 2 Q 2 2 2 50 Q 2 100 0 100 Q 2 100 2 150 Q 2 198 14 198"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.2"
+            />
+          </svg>
+        </div>
+        <div class="master-label">{masterLabel}</div>
+      </>
+    )}
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .bracket-canvas {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 1rem;
+    align-items: stretch;
+    padding: 1.5rem 0.5rem;
+    color: var(--ink, #000);
+    font-family: "Source Serif 4", "Times New Roman", Times, serif;
+    box-sizing: border-box;
+    min-width: 0;
+    overflow: hidden;
+    /* Override the 4:3 aspect-ratio + min-height that .diagram-canvas
+       inherits — those make sense for p5 canvases but not for content-sized
+       HTML grids. Let the layout collapse to its natural height. */
+    aspect-ratio: auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+  .bracket-rows {
+    grid-column: 1 / 2;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .bracket-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 0.75rem;
+    align-items: stretch;
+    min-width: 0;
+  }
+  .bracket-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    justify-content: center;
+    min-width: 0;
+    font-size: inherit;
+    line-height: inherit;
+    counter-reset: none;
+  }
+  .bracket-items > li {
+    counter-increment: none;
+    display: flex;
+    grid-template-columns: none !important;
+    align-items: baseline;
+    padding: 0 !important;
+    border: none !important;
+    font-style: italic;
+    font-size: 0.98em;
+    line-height: 1.4;
+    text-align: left;
+    max-width: none !important;
+    overflow-wrap: anywhere;
+  }
+  .bracket-items > li:first-child { border-top: none !important; }
+  .bracket-items > li::before { content: none !important; }
+  .bracket-items .item-rule {
+    opacity: 0.4;
+    letter-spacing: 0.1em;
+    margin-right: 0.4em;
+    font-style: normal;
+  }
+  .bracket-arm {
+    width: 1.6rem;
+    display: flex;
+    align-items: stretch;
+    color: var(--ink, #000);
+  }
+  .bracket-arm svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .bracket-label {
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    max-width: 12rem;
+    min-width: 0;
+  }
+  .g-label {
+    font-style: normal;
+    font-weight: 700;
+    font-variant: small-caps;
+    letter-spacing: 0.03em;
+    margin: 0 !important;
+    font-size: 0.95em;
+    line-height: 1.2;
+    max-width: none !important;
+  }
+  .g-gloss {
+    font-style: italic;
+    font-size: 0.82em;
+    line-height: 1.35;
+    margin: 0 !important;
+    opacity: 0.7;
+    max-width: none !important;
+    overflow-wrap: anywhere;
+  }
+
+  /* master brace wraps all groups */
+  .master-arm {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    width: 1.4rem;
+    align-self: stretch;
+    display: flex;
+    color: var(--ink, #000);
+    opacity: 0.7;
+  }
+  .master-arm svg { width: 100%; height: 100%; overflow: visible; }
+  .master-label {
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+    align-self: center;
+    font-style: italic;
+    font-size: 1.05em;
+    max-width: 9rem;
+    line-height: 1.3;
+    opacity: 0.85;
+    max-width: 12rem;
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 980px) {
+    .bracket-canvas {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      padding: 0.9rem 0.25rem;
+    }
+    .bracket-rows {
+      grid-column: 1;
+    }
+    .bracket-row {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid color-mix(in srgb, var(--ink, #000) 30%, transparent);
+    }
+    .bracket-row:last-child {
+      border-bottom: none;
+    }
+    .bracket-arm,
+    .master-arm {
+      display: none;
+    }
+    .bracket-label,
+    .master-label {
+      max-width: 100%;
+    }
+    .g-label {
+      font-size: 0.88em;
+    }
+    .g-gloss,
+    .master-label {
+      font-size: 0.78em;
+    }
+  }
+</style>

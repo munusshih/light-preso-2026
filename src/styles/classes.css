@@ -1,0 +1,118 @@
+/* Theme overrides for class-site pages.
+   Loaded on top of global.css — keeps the same component vocabulary
+   but shifts the palette toward a notebook / chalkboard feel. */
+
+:root {
+  --c: #1a8a6a; /* chalkboard green */
+  --m: #d94a38; /* red pencil */
+  --y: #f4d35e; /* highlighter yellow */
+  --k: #1d2b1f; /* deep ink */
+  --paper: #f6f1e4;
+}
+
+html {
+  background: var(--paper);
+  font-family: "Source Code Pro", "Be Vietnam Pro", monospace;
+}
+
+/* Body inherits global grid — just retune the paper tone */
+body {
+  background: var(--paper);
+}
+
+/* H1 cycling: classroom palette instead of CMYK */
+body > h1 {
+  font-family: "Be Vietnam Pro", system-ui, sans-serif;
+  letter-spacing: -0.04em;
+}
+
+body > h1:nth-of-type(4n + 1) { background: var(--c); color: #fff; }
+body > h1:nth-of-type(4n + 2) { background: var(--y); color: var(--k); }
+body > h1:nth-of-type(4n + 3) { background: var(--m); color: #fff; }
+body > h1:nth-of-type(4n + 4) { background: var(--k); color: var(--paper); }
+
+/* H2 — slightly more bookish */
+h2 {
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+
+/* Body paragraphs: a touch wider, less letter-spacing for readability */
+p {
+  font-size: clamp(16px, 1.35vw, 1rem);
+  letter-spacing: 0.01em;
+  max-width: 44ch;
+}
+
+/* List items: less dramatic than the index page — more like a syllabus */
+ul > li {
+  font-size: clamp(1.1rem, 3.5vw, 3rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Section eyebrows on this page feel like course codes */
+.preso-section .eyebrow {
+  font-family: "Source Code Pro", monospace;
+  letter-spacing: 0.18em;
+  opacity: 0.6;
+}
+
+/* A subtle margin-rule running down the prose column, like notebook paper */
+body > .preso-section {
+  position: relative;
+}
+
+/* hr stripes use the classroom palette too */
+body > hr:nth-of-type(4n + 1) { background: var(--c); }
+body > hr:nth-of-type(4n + 2) { background: var(--y); }
+body > hr:nth-of-type(4n + 3) { background: var(--m); }
+body > hr:nth-of-type(4n + 4) { background: var(--k); }
+
+/* A "callout" treatment used for the FERPA notice. The class is added in MDX. */
+.callout {
+  border: 2px dashed var(--m);
+  background: #fff;
+  padding: 1.5rem clamp(1.25rem, 3vw, 2.5rem);
+  max-width: 60ch;
+  margin: 1rem auto;
+  text-align: left;
+  border-radius: 4px;
+  box-shadow: 4px 4px 0 var(--k);
+}
+
+.callout h3 {
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--m);
+  margin-bottom: 0.75rem;
+}
+
+.callout p,
+.callout li {
+  font-size: 0.95rem;
+  font-weight: 400;
+  text-align: left;
+  max-width: none;
+  letter-spacing: 0;
+  margin: 0.25rem 0;
+}
+
+.callout ul {
+  text-align: left;
+  padding-left: 1.25rem;
+  list-style: disc;
+  margin: 0.5rem 0;
+}
+
+.callout ul > li {
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.6;
+  padding: 0.15em 0;
+  opacity: 1;
+  text-align: left;
+}

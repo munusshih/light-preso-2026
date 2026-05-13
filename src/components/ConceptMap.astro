@@ -1,0 +1,353 @@
+---
+interface Concept {
+  id: string;
+  label: string;
+  x?: number; // 0..1 horizontal position (optional override)
+  y?: number; // 0..1 vertical position (optional override)
+}
+interface Connection {
+  from: string;
+  to: string;
+  label?: string;
+  dashed?: boolean;
+}
+interface Props {
+  concepts: Concept[];
+  connections?: Connection[];
+  caption?: string;
+  border?: boolean;
+}
+const {
+  concepts,
+  connections = [],
+  caption,
+  border = false,
+} = Astro.props;
+
+const uid = `concept-map-${Math.random().toString(36).slice(2, 9)}`;
+const payload = JSON.stringify({ concepts, connections });
+---
+
+<figure class="diagram-figure concept-map-figure">
+  <div
+    class={`diagram-canvas concept-map${border ? " bordered" : ""}`}
+    id={uid}
+    data-concepts={payload}
+  ></div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<script>
+  import { loadP5, readThemeColors, readBodyFontPx } from "../lib/p5-loader";
+
+  type Concept = {
+    id: string;
+    label: string;
+    x?: number;
+    y?: number;
+  };
+  type Connection = {
+    from: string;
+    to: string;
+    label?: string;
+    dashed?: boolean;
+  };
+  type Node = {
+    id: string;
+    label: string;
+    x: number;
+    y: number;
+    ox: number;
+    oy: number;
+    phase: number;
+    speed: number;
+    w: number;
+    h: number;
+  };
+
+  function initMap(container: HTMLElement) {
+    if (container.dataset.cmReady === "1") return;
+    container.dataset.cmReady = "1";
+
+    const raw = container.dataset.concepts ?? "{}";
+    const { concepts, connections } = JSON.parse(raw) as {
+      concepts: Concept[];
+      connections: Connection[];
+    };
+
+    new (window as any).p5((p: any) => {
+      const nodes: Record<string, Node> = {};
+      let W = 0;
+      let H = 0;
+      let theme = { paper: "#fbfaf5", ink: "#000000" };
+      let bodyPx = 16;
+      let connectionLabelPx = 13;
+
+      function readCssFontPx(varName: string, fallback = 16) {
+        const probe = document.createElement("span");
+        probe.style.cssText =
+          `position:absolute;visibility:hidden;pointer-events:none;font-size:var(${varName});`;
+        container.appendChild(probe);
+        const px = parseFloat(getComputedStyle(probe).fontSize) || fallback;
+        probe.remove();
+        return px;
+      }
+
+      function refreshTheme() {
+        theme = readThemeColors(container);
+        bodyPx = readBodyFontPx(container);
+        connectionLabelPx = readCssFontPx("--fs-caption", bodyPx);
+      }
+
+      function uiScale() {
+        return Math.max(1, Math.min(W, H) / 420);
+      }
+
+      function layout() {
+        W = container.clientWidth;
+        H = container.clientHeight;
+        const cx = W / 2;
+        const cy = H / 2;
+        const radius = Math.min(W, H) * 0.39;
+        const autoNodes = concepts.filter(
+          (c) => c.x === undefined || c.y === undefined
+        );
+        const n = autoNodes.length;
+        let i = 0;
+        concepts.forEach((c) => {
+          let nx: number;
+          let ny: number;
+          if (c.x !== undefined && c.y !== undefined) {
+            nx = c.x * W;
+            ny = c.y * H;
+          } else {
+            const angle = (i / n) * p.TWO_PI - p.HALF_PI;
+            nx = cx + Math.cos(angle) * radius;
+            ny = cy + Math.sin(angle) * radius;
+            i++;
+          }
+          const existing = nodes[c.id];
+          if (existing) {
+            existing.ox = nx;
+            existing.oy = ny;
+            existing.label = c.label;
+          } else {
+            nodes[c.id] = {
+              id: c.id,
+              label: c.label,
+              x: nx,
+              y: ny,
+              ox: nx,
+              oy: ny,
+              phase: Math.random() * Math.PI * 2,
+              speed: 0.3 + Math.random() * 0.4,
+              w: 0,
+              h: 0,
+            };
+          }
+        });
+      }
+
+      // Draw text directly via the 2D context so the Times stack always wins —
+      // p5.textFont can lose multi-family font strings depending on version.
+      const FONT_STACK = '"Source Serif 4", "Times New Roman", Times, Georgia, serif';
+      let ctx: CanvasRenderingContext2D;
+
+      function setFont(size: number, italic = true) {
+        ctx.font = `${italic ? "italic " : ""}${size}px ${FONT_STACK}`;
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
+      }
+
+      p.setup = () => {
+        W = container.clientWidth;
+        H = container.clientHeight;
+        const canvas = p.createCanvas(W, H);
+        canvas.parent(container);
+        ctx = (p.drawingContext as CanvasRenderingContext2D);
+        refreshTheme();
+        layout();
+        matchMedia("(prefers-color-scheme: dark)").addEventListener(
+          "change",
+          refreshTheme
+        );
+      };
+
+      p.windowResized = () => {
+        const nw = container.clientWidth;
+        const nh = container.clientHeight;
+        if (nw === W && nh === H) return;
+        p.resizeCanvas(nw, nh);
+        refreshTheme();
+        layout();
+      };
+
+      function measure(label: string, size: number) {
+        setFont(size);
+        const tw = ctx.measureText(label).width;
+        return { w: tw + size * 1.5, h: size * 2.1 };
+      }
+
+      function nodeRectBounds(n: Node) {
+        return {
+          left: n.x - n.w / 2,
+          right: n.x + n.w / 2,
+          top: n.y - n.h / 2,
+          bottom: n.y + n.h / 2,
+        };
+      }
+
+      // Liang–Barsky-ish: clip a line from (x1,y1) toward (x2,y2) so it ends at the rect's edge.
+      function clipToRect(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        n: Node
+      ) {
+        const b = nodeRectBounds(n);
+        const dx = x1 - x2;
+        const dy = y1 - y2;
+        const candidates: number[] = [];
+        if (dx !== 0) {
+          const t1 = (b.left - x2) / dx;
+          const t2 = (b.right - x2) / dx;
+          [t1, t2].forEach((t) => {
+            if (t > 0 && t < 1) {
+              const py = y2 + t * dy;
+              if (py >= b.top - 0.5 && py <= b.bottom + 0.5) candidates.push(t);
+            }
+          });
+        }
+        if (dy !== 0) {
+          const t1 = (b.top - y2) / dy;
+          const t2 = (b.bottom - y2) / dy;
+          [t1, t2].forEach((t) => {
+            if (t > 0 && t < 1) {
+              const px = x2 + t * dx;
+              if (px >= b.left - 0.5 && px <= b.right + 0.5) candidates.push(t);
+            }
+          });
+        }
+        if (!candidates.length) return { x: x2, y: y2 };
+        const t = Math.min(...candidates);
+        return { x: x2 + t * dx, y: y2 + t * dy };
+      }
+
+      function drawDashedLine(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        dash = 5 * uiScale(),
+        gap = 4 * uiScale()
+      ) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len = Math.hypot(dx, dy);
+        const step = dash + gap;
+        const ux = dx / len;
+        const uy = dy / len;
+        for (let d = 0; d < len; d += step) {
+          const sx = x1 + ux * d;
+          const sy = y1 + uy * d;
+          const ex = x1 + ux * Math.min(d + dash, len);
+          const ey = y1 + uy * Math.min(d + dash, len);
+          p.line(sx, sy, ex, ey);
+        }
+      }
+
+      function drawArrow(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        dashed = false
+      ) {
+        const s = uiScale();
+        p.stroke(theme.ink);
+        p.strokeWeight(0.9 * s);
+        if (dashed) {
+          drawDashedLine(x1, y1, x2, y2);
+        } else {
+          p.line(x1, y1, x2, y2);
+        }
+        const ang = Math.atan2(y2 - y1, x2 - x1);
+        const ah = 8 * s;
+        p.push();
+        p.translate(x2, y2);
+        p.rotate(ang);
+        p.noStroke();
+        p.fill(theme.ink);
+        p.triangle(0, 0, -ah, -ah * 0.5, -ah, ah * 0.5);
+        p.pop();
+      }
+
+      p.draw = () => {
+        p.clear();
+        const t = p.millis() / 1000;
+        const s = uiScale();
+        const labelSize = bodyPx;
+
+        Object.values(nodes).forEach((n) => {
+          n.x = n.ox + Math.sin(t * n.speed + n.phase) * 7 * s;
+          n.y = n.oy + Math.cos(t * (n.speed * 0.85) + n.phase) * 7 * s;
+        });
+
+        Object.values(nodes).forEach((n) => {
+          const m = measure(n.label, labelSize);
+          n.w = m.w;
+          n.h = m.h;
+        });
+
+        // arrows
+        connections.forEach((c) => {
+          const a = nodes[c.from];
+          const b = nodes[c.to];
+          if (!a || !b) return;
+          const start = clipToRect(b.x, b.y, a.x, a.y, a);
+          const end = clipToRect(a.x, a.y, b.x, b.y, b);
+          drawArrow(start.x, start.y, end.x, end.y, !!c.dashed);
+          if (c.label) {
+            const mx = (start.x + end.x) / 2;
+            const my = (start.y + end.y) / 2;
+            setFont(connectionLabelPx, true);
+            const lw = ctx.measureText(c.label).width + 14 * s;
+            ctx.fillStyle = theme.paper;
+            const lh = connectionLabelPx * 1.5;
+            ctx.fillRect(mx - lw / 2, my - lh / 2, lw, lh);
+            ctx.fillStyle = theme.ink;
+            ctx.fillText(c.label, mx, my);
+          }
+        });
+
+        // nodes — outlined boxes with italic serif labels
+        Object.values(nodes).forEach((n) => {
+          p.push();
+          p.rectMode(p.CENTER);
+          p.stroke(theme.ink);
+          p.strokeWeight(0.95 * s);
+          p.fill(theme.paper);
+          p.rect(n.x, n.y, n.w, n.h);
+          p.pop();
+
+          setFont(labelSize, true);
+          ctx.fillStyle = theme.ink;
+          ctx.fillText(n.label, n.x, n.y);
+        });
+      };
+    });
+  }
+
+  function initAll() {
+    document
+      .querySelectorAll<HTMLElement>(".concept-map")
+      .forEach((el) => initMap(el));
+  }
+
+  loadP5()
+    .then(initAll)
+    .catch(() => {
+      /* p5 failed to load — leave a blank box */
+    });
+</script>
